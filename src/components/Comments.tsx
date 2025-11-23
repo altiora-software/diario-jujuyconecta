@@ -27,19 +27,19 @@ export default function Comments({ noticiaId }: Props) {
     let mounted = true;
 
     async function fetchComments() {
-    //   const { data, error } = await supabase
-    //     .from("notas_comentarios")
-    //     .select("*")
-    //     .eq("noticia_id", noticiaId)
-    //     .order("created_at", { ascending: false });
+      const { data, error } = await supabase
+        .from("notas_comentarios")
+        .select("*")
+        .eq("noticia_id", noticiaId)
+        .order("created_at", { ascending: false });
 
-    //   if (!mounted) return;
+      if (!mounted) return;
 
-    //   if (error) {
-    //     toast.error("Error al cargar comentarios.");
-    //   } else {
-    //     setComentarios(data as Comentario[]);
-    //   }
+      if (error) {
+        toast.error("Error al cargar comentarios.");
+      } else {
+        setComentarios(data as Comentario[]);
+      }
 
       setLoading(false);
     }

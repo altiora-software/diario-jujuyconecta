@@ -39,6 +39,67 @@ export type Database = {
   }
   public: {
     Tables: {
+      // Dentro de Database["public"]["Tables"]
+        notas_comentarios: {
+          Row: {
+            id: number;
+            noticia_id: number;
+            contenido: string;
+            created_at: string;
+          };
+          Insert: {
+            id?: number;
+            noticia_id: number;
+            contenido: string;
+            created_at?: string;
+          };
+          Update: {
+            id?: number;
+            noticia_id?: number;
+            contenido?: string;
+            created_at?: string;
+          };
+          Relationships: [
+            {
+              foreignKeyName: "notas_comentarios_noticia_id_fkey";
+              columns: ["noticia_id"];
+              isOneToOne: false;
+              referencedRelation: "noticias";
+              referencedColumns: ["id"];
+            }
+          ];
+        };
+
+        notas_rating: {
+          Row: {
+            id: number;
+            noticia_id: number;
+            rating: number;
+            created_at: string;
+          };
+          Insert: {
+            id?: number;
+            noticia_id: number;
+            rating: number;
+            created_at?: string;
+          };
+          Update: {
+            id?: number;
+            noticia_id?: number;
+            rating?: number;
+            created_at?: string;
+          };
+          Relationships: [
+            {
+              foreignKeyName: "notas_rating_noticia_id_fkey";
+              columns: ["noticia_id"];
+              isOneToOne: false;
+              referencedRelation: "noticias";
+              referencedColumns: ["id"];
+            }
+          ];
+        };
+
       banners: {
         Row: {
           activo: boolean

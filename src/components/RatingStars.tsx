@@ -18,17 +18,17 @@ export default function RatingStars({ noticiaId }: Props) {
     if (loading) return;
     setLoading(true);
 
-    // const { error } = await supabase.from("notas_rating").insert({
-    //   noticia_id: noticiaId,
-    //   rating: value,
-    // });
+    const { error } = await supabase.from("notas_rating").insert({
+      noticia_id: noticiaId,
+      rating: value,
+    });
 
     setLoading(false);
 
-    // if (error) {
-    //   toast.error("Error al guardar tu puntuación.");
-    //   return;
-    // }
+    if (error) {
+      toast.error("Error al guardar tu puntuación.");
+      return;
+    }
 
     setRating(value);
     toast.success("Gracias por tu puntuación!");
