@@ -17,9 +17,6 @@ type Nota = {
   created_at: string;
 };
 
-type RouteParams = {
-  params: Promise<{ slug: string }>;
-};
 
 // función común para no repetir la query
 async function getNotaBySlug(slug: string): Promise<Nota | null> {
@@ -39,9 +36,13 @@ async function getNotaBySlug(slug: string): Promise<Nota | null> {
 }
 
 // ------- SEO dinámico para la nota --------
+type RouteParams = {
+  params: Promise<{ slug: string }>;
+};
+
 export async function generateMetadata(
   { params }: RouteParams,
-  _parent: ResolvingMetadata
+  parent: ResolvingMetadata
 ): Promise<Metadata> {
   const { slug } = await params;
   const nota = await getNotaBySlug(slug);
@@ -50,19 +51,33 @@ export async function generateMetadata(
     return {
       title: "Noticia no encontrada",
       description: "La noticia que buscás no existe o fue eliminada.",
+      robots: { index: false, follow: false },
     };
   }
 
+  const previousImages = (await parent).openGraph?.images || [];
   const url = `/nota/${nota.slug}`;
+
+  const description =
+    nota.resumen ??
+    (nota.contenido ? nota.contenido.replace(/<[^>]+>/g, "").slice(0, 160) : "");
+
+  const published = nota.fecha_publicacion || nota.created_at;
 
   return {
     title: nota.titulo,
-    description: nota.resumen ?? nota.contenido?.slice(0, 160) ?? "",
+    description,
+    alternates: {
+      canonical: url,
+    },
     openGraph: {
-      title: nota.titulo,
-      description: nota.resumen ?? "",
       type: "article",
       url,
+      title: nota.titulo,
+      description,
+      publishedTime: published,
+      modifiedTime: nota.created_at,
+      siteName: "Jujuy Conecta Diario",
       images: nota.imagen_url
         ? [
             {
@@ -72,12 +87,12 @@ export async function generateMetadata(
               alt: nota.titulo,
             },
           ]
-        : undefined,
+        : previousImages,
     },
     twitter: {
       card: "summary_large_image",
       title: nota.titulo,
-      description: nota.resumen ?? "",
+      description,
       images: nota.imagen_url ? [nota.imagen_url] : undefined,
     },
   };

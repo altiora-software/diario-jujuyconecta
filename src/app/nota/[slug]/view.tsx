@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { supabase } from "@/integrations/supabase/client";
 import RecentNewsList from "@/components/RecentNewsList";
+import Script from "next/script";
 
 export type Nota = {
   id: number;
@@ -30,15 +31,13 @@ export function NoticiaView({ nota }: NoticiaViewProps) {
   const pathname = usePathname();
 
   // Chequeo de sesión (como antes)
-  useEffect(() => {
+  useEffect(() => { 
     supabase.auth.getUser().then((result: { data: { user: any; }; }) => {
       const user = (result.data && 'user' in result.data) ? result.data.user : undefined;
       setIsLogged(!!user);
     });
   }, []);
 
-  // No tenemos location.state como en React Router,
-  // pero si querés podés inferir "from admin" por query string
   useEffect(() => {
     if (typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
@@ -46,6 +45,64 @@ export function NoticiaView({ nota }: NoticiaViewProps) {
   }, [pathname]);
 
   const mostrarLinkAdmin = isLogged || fromAdmin;
+
+  const fechaISO = new Date(
+    nota.fecha_publicacion || nota.created_at
+  ).toISOString();
+
+  const jsonLdArticle = {
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    headline: nota.titulo,
+    datePublished: fechaISO,
+    dateModified: fechaISO,
+    description:
+      nota.resumen ??
+      (nota.contenido
+        ? nota.contenido.replace(/<[^>]+>/g, "").slice(0, 160)
+        : ""),
+    image: nota.imagen_url ? [nota.imagen_url] : undefined,
+    author: nota.autor
+      ? { "@type": "Person", name: nota.autor }
+      : { "@type": "Organization", name: "Jujuy Conecta Diario" },
+    publisher: {
+      "@type": "Organization",
+      name: "Jujuy Conecta Diario",
+      logo: {
+        "@type": "ImageObject",
+        url: "https://jujuyconecta.online/diario/jc-logo.png",
+      },
+    },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `https://jujuyconecta.online/diario/nota/${nota.slug}`,
+    },
+  };
+
+  const jsonLdBreadcrumb = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Inicio",
+        item: "https://jujuyconecta.online/diario",
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Noticias",
+        item: "https://jujuyconecta.online/diario",
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: nota.titulo,
+        item: `https://jujuyconecta.online/diario/nota/${nota.slug}`,
+      },
+    ],
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -128,6 +185,22 @@ export function NoticiaView({ nota }: NoticiaViewProps) {
             </div>
           </aside>
         </div>
+        <Script
+          id="ld-article"
+          type="application/ld+json"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(jsonLdArticle),
+          }}
+        />
+        <Script
+          id="ld-breadcrumb"
+          type="application/ld+json"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(jsonLdBreadcrumb),
+          }}
+        />
       </main>
     </div>
   );
