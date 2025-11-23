@@ -4,17 +4,13 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/integrations/supabase/client";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-} from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 type NotaResumida = {
   id: number;
   titulo: string;
   slug: string;
+  imagen_url: string | null;
   fecha_publicacion: string | null;
   created_at: string;
 };
@@ -36,7 +32,9 @@ const RecentNewsList = () => {
 
         const { data, error } = await supabase
           .from("noticias")
-          .select("id, titulo, slug, fecha_publicacion, created_at, estado")
+          .select(
+            "id, titulo, slug, imagen_url, fecha_publicacion, created_at, estado"
+          )
           .eq("estado", "publicado")
           .order("fecha_publicacion", { ascending: false })
           .limit(MAX_NOTICIAS);
@@ -49,6 +47,7 @@ const RecentNewsList = () => {
               id: n.id,
               titulo: n.titulo,
               slug: n.slug,
+              imagen_url: n.imagen_url,
               fecha_publicacion: n.fecha_publicacion,
               created_at: n.created_at,
             }))
@@ -56,8 +55,9 @@ const RecentNewsList = () => {
         }
       } catch (e: any) {
         if (!cancelled) {
-          console.error("Error cargando noticias recientes:", e);
-          setError(e?.message ?? "Error al cargar noticias recientes");
+          setError(
+            e?.message ?? "Error al cargar noticias recientes"
+          );
         }
       } finally {
         if (!cancelled) setLoading(false);
@@ -65,7 +65,6 @@ const RecentNewsList = () => {
     }
 
     fetchRecent();
-
     return () => {
       cancelled = true;
     };
@@ -78,27 +77,26 @@ const RecentNewsList = () => {
           Últimas noticias
         </CardTitle>
       </CardHeader>
+
       <CardContent>
         {loading && (
           <p className="text-sm text-muted-foreground">
-            Cargando noticias recientes…
+            Cargando noticias…
           </p>
         )}
 
         {error && (
-          <p className="text-sm text-destructive">
-            {error}
-          </p>
+          <p className="text-sm text-destructive">{error}</p>
         )}
 
         {!loading && !error && noticias.length === 0 && (
           <p className="text-sm text-muted-foreground">
-            No hay noticias recientes disponibles.
+            No hay noticias recientes.
           </p>
         )}
 
         {!loading && !error && noticias.length > 0 && (
-          <ul className="space-y-3">
+          <ul className="space-y-4">
             {noticias.map((nota) => {
               const fecha = new Date(
                 nota.fecha_publicacion || nota.created_at
@@ -112,14 +110,28 @@ const RecentNewsList = () => {
                 <li key={nota.id}>
                   <Link
                     href={`/nota/${nota.slug}`}
-                    className="group block"
+                    className="group flex gap-3 rounded-md p-2 hover:bg-muted/50 transition-colors"
                   >
-                    <p className="text-sm font-medium text-foreground group-hover:text-primary line-clamp-2">
-                      {nota.titulo}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {fecha}
-                    </p>
+                    {/* Imagen miniatura */}
+                    {nota.imagen_url && (
+                      <div className="w-20 h-20 rounded-md overflow-hidden flex-shrink-0">
+                        <img
+                          src={nota.imagen_url}
+                          alt={nota.titulo}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                        />
+                      </div>
+                    )}
+
+                    {/* Texto */}
+                    <div className="flex flex-col justify-between">
+                      <p className="text-sm font-medium text-foreground group-hover:text-primary line-clamp-2 group-hover:line-clamp-none transition-all">
+                        {nota.titulo}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {fecha}
+                      </p>
+                    </div>
                   </Link>
                 </li>
               );

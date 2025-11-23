@@ -54,7 +54,7 @@ function WeatherClockPill() {
         hour: "2-digit",
         minute: "2-digit",
       });
-        if (!cancelled) setHora(local);
+      if (!cancelled) setHora(local);
     };
 
     async function fetchWeather() {
@@ -169,16 +169,18 @@ const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const categorias = [
-    { nombre: "Provinciales", slug: "provinciales" },
-    { nombre: "Nacionales", slug: "nacionales" },
-    { nombre: "Deportes", slug: "deportes" },
-    { nombre: "Cultura", slug: "cultura" },
-    { nombre: "Radio", slug: "radio" },
-    { nombre: "Mundo", slug: "mundo" },
+    { nombre: "Provinciales", href: "/seccion/provinciales" },
+    { nombre: "Nacionales", href: "/seccion/nacionales" },
+    { nombre: "Deportes", href: "/seccion/deportes" },
+    { nombre: "Cultura", href: "/seccion/cultura" },
+    // Radio va directo a la page de radio, no al slug de sección
+    { nombre: "Radio", href: "/radio" },
+    { nombre: "Mundo", href: "/seccion/mundo" },
   ];
 
   const toggleMenu = () => setMenuOpen((v) => !v);
   const closeMenu = () => setMenuOpen(false);
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-news-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4">
@@ -209,8 +211,8 @@ const Header = () => {
           <nav className="hidden md:flex items-center space-x-6">
             {categorias.map((cat) => (
               <Link
-                key={cat.slug}
-                href={`/seccion/${cat.slug}`}
+                key={cat.href}
+                href={cat.href}
                 className="text-sm font-medium text-foreground hover:text-primary editorial-transition"
               >
                 {cat.nombre}
@@ -254,8 +256,8 @@ const Header = () => {
             <nav className="flex flex-col py-2 space-y-2">
               {categorias.map((cat) => (
                 <Link
-                  key={cat.slug}
-                  href={`/seccion/${cat.slug}`}
+                  key={cat.href}
+                  href={cat.href}
                   onClick={closeMenu}
                   className="px-4 py-2 text-sm font-medium text-foreground hover:bg-muted hover:text-primary transition-colors"
                 >

@@ -7,7 +7,7 @@ import Ticker from "@/components/Ticker";
 import { Card, CardContent } from "@/components/ui/card";
 import type { Database } from "@/integrations/supabase/supabase";
 
-// 👇 Cliente SERVER-SIDE (sin localStorage, sin import.meta.env)
+// 👇 Cliente SERVER-SIDE (después lo extraemos a helper compartido)
 const supabaseServer = createClient<Database>(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -46,39 +46,30 @@ export default async function HomePage() {
     <div className="min-h-screen bg-background">
       <SocialSidebar />
 
+      {/* Barra superior de Último Momento, igual que en la home general */}
+      {noticias.length > 0 && (
+        <section className="w-full bg-primary text-primary-foreground">
+          <div className="container mx-auto px-4 py-1">
+            <Ticker
+              noticias={noticias.map((n) => ({
+                id: n.id,
+                titulo: n.titulo,
+              }))}
+            />
+          </div>
+        </section>
+      )}
+
+      {/* HERO DEL DIARIO, limpio y centrado como en la imagen 2 */}
       <section className="border-b bg-muted/40">
-        <div className="container mx-auto px-4 py-6 flex flex-col gap-4 lg:flex-row lg:items-start">
-          <div className="flex-1 space-y-3">
-            <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-1">
-              Diario digital de Jujuy
-            </p>
-            <h1 className="text-3xl md:text-4xl font-bold leading-tight text-headline-primary">
+        <div className="container mx-auto px-4 py-10">
+          <div className="max-w-3xl mx-auto text-center space-y-2">
+            <h1 className="text-5xl md:text-6xl font-bold text-primary mb-4">
               Jujuy Conecta Diario
             </h1>
-            <p className="text-sm md:text-base text-muted-foreground max-w-xl">
-              Noticias de Jujuy y Argentina, con foco en transporte, obras,
-              comunidad y todo lo que pasa en la provincia.
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Tu fuente de información más confiable
             </p>
-          </div>
-
-          <div className="w-full lg:w-[340px] flex flex-col gap-3">
-            <div className="rounded-lg border bg-background p-3">
-              <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
-                Radio en vivo
-              </h2>
-              <RadioPlayer />
-            </div>
-            <div className="rounded-lg border bg-background p-3">
-              <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
-                Último momento
-              </h2>
-              <Ticker
-                noticias={noticias.map((n) => ({
-                  id: n.id,
-                  titulo: n.titulo,
-                }))}
-              />
-            </div>
           </div>
         </div>
       </section>
@@ -129,38 +120,48 @@ export default async function HomePage() {
             </article>
 
             <aside className="space-y-4">
-              {secundarias.map((nota) => (
-                <Link href={`/nota/${nota.slug}`} key={nota.id} >
-                  <Card className="h-full hover:bg-muted/60 transition-colors">
-                    <CardContent className="p-3 flex gap-3">
+              {secundarias.map((nota) => {
+                const fecha = new Date(
+                  nota.fecha_publicacion ?? nota.created_at
+                ).toLocaleDateString("es-AR", {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                });
+
+                return (
+                  <Card
+                    key={nota.id}
+                    className="group overflow-hidden hover:bg-muted/60 transition-colors"
+                  >
+                    <Link
+                      href={`/nota/${nota.slug}`}
+                      className="flex gap-3 p-3"
+                    >
                       {nota.imagen_url && (
                         <div className="w-24 h-24 rounded-md overflow-hidden flex-shrink-0">
                           <img
                             src={nota.imagen_url}
                             alt={nota.titulo}
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                           />
                         </div>
                       )}
+
                       <div className="flex flex-col gap-1">
-                        <h3 className="text-sm font-semibold text-foreground line-clamp-2">
+                        <h3 className="text-sm font-semibold text-foreground line-clamp-2 group-hover:line-clamp-none transition-all">
                           {nota.titulo}
                         </h3>
                         <time className="text-[11px] text-muted-foreground">
-                          {new Date(
-                            nota.fecha_publicacion ?? nota.created_at
-                          ).toLocaleDateString("es-AR", {
-                            year: "numeric",
-                            month: "short",
-                            day: "numeric",
-                          })}
+                          {fecha}
                         </time>
                       </div>
-                    </CardContent>
+                    </Link>
                   </Card>
-                </Link>
-              ))}
+                );
+              })}
             </aside>
+
           </section>
         )}
 
