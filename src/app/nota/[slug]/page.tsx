@@ -2,7 +2,11 @@
 import { notFound } from "next/navigation";
 import type { Metadata, ResolvingMetadata } from "next";
 import { supabase } from "@/integrations/supabase/client";
+import RatingStars from "@/components/RatingStars";
+import Comments from "@/components/Comments";
 import RecentNewsList from "@/components/RecentNewsList";
+import ShareButtons from "@/components/ShareButtons";
+
 
 type Nota = {
   id: number;
@@ -173,6 +177,12 @@ export default async function NoticiaPage({ params }: RouteParams) {
                 className="prose prose-lg max-w-none text-foreground leading-relaxed prose-headings:text-foreground prose-a:text-primary"
                 dangerouslySetInnerHTML={{ __html: nota.contenido ?? "" }}
               />
+              <ShareButtons titulo={nota.titulo} slug={nota.slug} />
+              {/* Rating */}
+            <RatingStars noticiaId={nota.id} />
+
+            {/* Comentarios */}
+            <Comments noticiaId={nota.id} />
             </div>
           </article>
 
