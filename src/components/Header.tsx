@@ -173,7 +173,6 @@ const Header = () => {
     { nombre: "Nacionales", href: "/seccion/nacionales" },
     { nombre: "Deportes", href: "/seccion/deportes" },
     { nombre: "Cultura", href: "/seccion/cultura" },
-    // Radio va directo a la page de radio, no al slug de sección
     { nombre: "Radio", href: "/radio" },
     { nombre: "Mundo", href: "/seccion/mundo" },
   ];
@@ -220,8 +219,36 @@ const Header = () => {
             ))}
           </nav>
 
-          {/* Search & Mobile Menu Button */}
+          {/* Search + CTA + Mobile Menu Button */}
           <div className="flex items-center space-x-2">
+            {/* CTA a la plataforma – solo desktop */}
+            <Button
+              asChild
+              size="sm"
+              className="hidden md:inline-flex shadow-sm"
+            >
+              <Link
+                href="https://jujuyconecta.com"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                🚀 Ingresar a la plataforma
+              </Link>
+            </Button>
+
+            {/* Search desktop */}
+            <form action="/buscar" method="GET" className="relative hidden sm:block">
+              <Search className="absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                type="search"
+                name="q"
+                placeholder="Buscar noticias..."
+                className="pl-8 w-48 lg:w-64"
+              />
+            </form>
+
+
+            {/* Botón menú mobile */}
             <Button
               variant="ghost"
               size="icon"
@@ -235,15 +262,6 @@ const Header = () => {
                 <Menu className="h-5 w-5 text-green" />
               )}
             </Button>
-
-            <div className="relative hidden sm:block">
-              <Search className="absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder="Buscar noticias..."
-                className="pl-8 w-48 lg:w-64"
-              />
-            </div>
           </div>
         </div>
 
@@ -264,6 +282,19 @@ const Header = () => {
                   {cat.nombre}
                 </Link>
               ))}
+
+              <div className="px-4 pt-2 pb-3">
+                <Button asChild className="w-full">
+                  <Link
+                    href="https://jujuyconecta.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={closeMenu}
+                  >
+                    🚀 Ingresar a la plataforma
+                  </Link>
+                </Button>
+              </div>
             </nav>
           </div>
         )}
