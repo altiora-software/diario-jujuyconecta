@@ -1,0 +1,174 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==== Design system (mismo que en Vite) ==== */
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 217 33% 17%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 217 33% 17%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 217 33% 17%;
+
+    --primary: 168 70% 29%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 210 16% 96%;
+    --secondary-foreground: 217 33% 17%;
+
+    --muted: 0 0% 96%;
+    --muted-foreground: 220 13% 50%;
+
+    --accent: 168 70% 28%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 13% 83%;
+    --input: 220 13% 83%;
+    --ring: 168 70% 28%;
+
+    --radius: 0.5rem;
+
+    /* Editorial */
+    --news-hero: 168 70% 28%;
+    --news-accent: 141 45% 80%;
+    --news-hover: 168 70% 24%;
+    --news-border: 220 13% 91%;
+
+    /* Typography extra */
+    --headline-primary: 217 33% 17%;
+    --text-secondary: 220 13% 50%;
+    --text-muted: 220 13% 65%;
+  }
+
+  .dark {
+    --background: 217 33% 10%;
+    --foreground: 0 0% 98%;
+
+    --card: 217 33% 12%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 217 33% 12%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 141 45% 70%;
+    --primary-foreground: 217 33% 17%;
+
+    --secondary: 168 30% 25%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 217 33% 15%;
+    --muted-foreground: 220 13% 65%;
+
+    --accent: 141 45% 70%;
+    --accent-foreground: 217 33% 17%;
+
+    --destructive: 0 62.8% 45%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 217 33% 20%;
+    --input: 217 33% 20%;
+    --ring: 141 45% 70%;
+
+    --news-hero: 141 45% 70%;
+    --news-accent: 168 30% 25%;
+    --news-hover: 141 45% 75%;
+    --news-border: 217 33% 20%;
+
+    --headline-primary: 0 0% 98%;
+    --text-secondary: 220 13% 70%;
+    --text-muted: 220 13% 60%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "kern" 1;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply text-[hsl(var(--headline-primary))];
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  p {
+    line-height: 1.7;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .editorial-transition {
+    @apply transition-all duration-300 ease-in-out;
+  }
+
+  .card-hover {
+    @apply hover:shadow-lg hover:scale-[1.02] editorial-transition;
+  }
+}
+
+/* ==== estilos que tenías en App.css de Vite ==== */
+
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
