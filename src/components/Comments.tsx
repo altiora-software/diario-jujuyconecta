@@ -55,25 +55,34 @@ export default function Comments({ noticiaId }: Props) {
       toast.error("El comentario no puede estar vacío.");
       return;
     }
-
+  
     setSaving(true);
-
-    // const { data, error } = await supabase.from("notas_comentarios").insert({
-    //   noticia_id: noticiaId,
-    //   contenido,
-    // }).select("*").single();
-
-    // setSaving(false);
-
-    // if (error) {
-    //   toast.error("Error al publicar comentario.");
-    //   return;
-    // }
-
-    setContenido("");
-    // setComentarios(prev => [data as Comentario, ...prev]);
-    toast.success("Comentario publicado.");
+  
+    try {
+      const { data, error } = await supabase
+        .from("notas_comentarios")
+        .insert([{ noticia_id: noticiaId, contenido }])
+        .select("*")
+        .single(); // si esperás un solo objeto
+  
+      if (error) {
+        console.error("Supabase insert error:", error);
+        toast.error("Error al publicar comentario.");
+        return;
+      }
+  
+      // si todo OK, limpiar input y actualizar lista localmente
+      setContenido("");
+      setComentarios(prev => [data as Comentario, ...prev]);
+      toast.success("Comentario publicado.");
+    } catch (err: any) {
+      console.error("handleSubmit unexpected error:", err);
+      toast.error("Error al publicar comentario.");
+    } finally {
+      setSaving(false); // importante: siempre liberar el estado
+    }
   }
+  
 
   return (
     <div className="mt-10 border-t pt-8">
