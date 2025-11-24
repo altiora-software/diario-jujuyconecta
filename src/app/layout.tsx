@@ -100,6 +100,18 @@ export default function RootLayout({
   return (
     <html lang="es">
       <head>
+        {/* Google tag (gtag.js) */}
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-KS718BB0WX"></script>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-KS718BB0WX');
+            `,
+          }}
+        />
         {/* Google AdSense */}
         <Script
           id="adsense-script"
