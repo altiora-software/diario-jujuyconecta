@@ -288,7 +288,7 @@ const Header = () => {
               <Button
                 asChild
                 size="sm"
-                className="hidden md:inline-flex shadow-sm"
+                className="md:inline-flex shadow-sm"
               >
                 <a
                   href="https://jujuyconecta.com"
