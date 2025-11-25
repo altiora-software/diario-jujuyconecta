@@ -11,6 +11,11 @@ const siteUrl =
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
+  icons: {
+    icon: "/favicon.ico",                // favicon clásico
+    shortcut: "/favicon.ico",            // atajo para navegadores antiguos
+    apple: "/apple-touch-icon.png",      // opcional: si querés soporte iOS (colocá este archivo en /public)
+  },
   title: {
     default: "Jujuy Conecta Diario | Noticias de Jujuy, Argentina y radio en vivo",
     template: "%s | Jujuy Conecta Diario",
@@ -100,6 +105,8 @@ export default function RootLayout({
   return (
     <html lang="es">
       <head>
+      <link rel="icon" href="/favicon.ico" />
+      <link rel="shortcut icon" href="/favicon.ico" />
         {/* Google tag (gtag.js) */}
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-KS718BB0WX"></script>
         <script
