@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { supabase } from "@/integrations/supabase/client";
@@ -16,6 +16,20 @@ type NotaBusqueda = {
 };
 
 export default function BuscarPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="container mx-auto px-4 py-8">
+          <p className="text-sm text-muted-foreground">Cargando búsqueda…</p>
+        </div>
+      }
+    >
+      <BuscarContent />
+    </Suspense>
+  );
+}
+
+function BuscarContent() {
   const searchParams = useSearchParams();
   const q = (searchParams.get("q") ?? "").trim();
 
@@ -49,6 +63,7 @@ export default function BuscarPage() {
           .limit(50);
 
         if (error) throw error;
+
         if (!cancelled) {
           setResultados((data as NotaBusqueda[]) ?? []);
         }
@@ -74,9 +89,7 @@ export default function BuscarPage() {
   return (
     <div className="container mx-auto px-4 py-8 space-y-4">
       <header>
-        <h1 className="text-2xl font-semibold">
-          Buscar noticias
-        </h1>
+        <h1 className="text-2xl font-semibold">Buscar noticias</h1>
         {q && (
           <p className="text-sm text-muted-foreground mt-1">
             Resultados para{" "}
@@ -92,15 +105,11 @@ export default function BuscarPage() {
       )}
 
       {q && loading && (
-        <p className="text-sm text-muted-foreground">
-          Buscando noticias…
-        </p>
+        <p className="text-sm text-muted-foreground">Buscando noticias…</p>
       )}
 
       {q && !loading && error && (
-        <p className="text-sm text-destructive">
-          Error al buscar: {error}
-        </p>
+        <p className="text-sm text-destructive">Error al buscar: {error}</p>
       )}
 
       {q && !loading && !error && resultados.length === 0 && (

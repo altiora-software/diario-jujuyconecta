@@ -86,7 +86,7 @@ export default function NuevaNoticiaForm() {
     setSlug("");
     setResumen("");
     setContenido("");
-    setCategoriaId(undefined);
+    setCategoriaId("");
     setFile(null);
 
     // Refresco simple (si querés, después lo cambiamos por callback)

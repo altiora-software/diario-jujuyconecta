@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 const SUPABASE_ANON_KEY =
-  import.meta.env.VITE_SUPABASE_ANON_KEY ||
-  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+  process.env.VITE_SUPABASE_ANON_KEY ||
+  process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
 const FUNCTION_HEADERS = SUPABASE_ANON_KEY
   ? {
@@ -43,7 +43,7 @@ export default function NoticiasGlobales({
   const [err, setErr] = useState<string | null>(null);
 
   // ✅ Usar la variable de entorno si existe
-  const NEWS_PROXY_URL = import.meta.env.VITE_NEWS_PROXY_URL as string | undefined;
+  const NEWS_PROXY_URL = process.env.VITE_NEWS_PROXY_URL as string | undefined;
 
   useEffect(() => {
     let cancelled = false;
@@ -71,7 +71,7 @@ export default function NoticiasGlobales({
         let articles: any[] = [];
 
         // ---- 1) Intento principal: top-headlines ----
-        const resTop = await fetch(urlTop, {headers: FUNCTION_HEADERS})
+        const resTop = await fetch(urlTop, { headers: buildNewsHeaders() });
         const jsonTop = await resTop.json();
         console.log("[NoticiasGlobales] Response:", jsonTop);
 
@@ -88,7 +88,7 @@ export default function NoticiasGlobales({
           const urlEv = `${NEWS_PROXY_URL}/everything?${p2.toString()}`;
           console.log("[NoticiasGlobales] Fallback to:", urlEv);
 
-          const resEv = await fetch(urlEv, {headers: FUNCTION_HEADERS});
+          const resEv = await fetch(urlEv, {headers: buildNewsHeaders()});
           const jsonEv = await resEv.json();
           console.log("[NoticiasGlobales] Fallback response:", jsonEv);
 
@@ -197,3 +197,7 @@ export default function NoticiasGlobales({
     </div>
   );
 }
+function buildNewsHeaders(): HeadersInit | undefined {
+  throw new Error("Function not implemented.");
+}
+

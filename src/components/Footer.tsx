@@ -91,11 +91,11 @@ export default function Footer() {
             </h3>
             <div className="space-y-3">
               <a
-                href="mailto:contacto@jujuyconecta.com"
+                href="mailto:jujuyconecta@gmail.com"
                 className="flex items-center gap-3 text-slate-300 hover:text-primary transition-colors duration-300 text-sm group"
               >
                 <Mail className="w-5 h-5 flex-shrink-0 group-hover:scale-110 transition-transform duration-300" />
-                <span>contacto@jujuyconecta.com</span>
+                <span>jujuyconecta@gmail.com</span>
               </a>
               <a
                 href="tel:+543884000000"
