@@ -192,7 +192,7 @@ const Header = () => {
             onClick={closeMenu}
           >
             <img
-              src="/jc-logo.png"
+              src="/jc-loguito.png"
               alt="Jujuy Conecta"
               className="h-10 w-10 rounded-full"
             />

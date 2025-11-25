@@ -89,7 +89,7 @@ export default function RootLayout({
     "@type": "NewsMediaOrganization",
     name: "Jujuy Conecta Diario",
     url: siteUrl,
-    logo: `${siteUrl}/jc-logo.png`,
+    logo: `${siteUrl}/jc-loguito.png`,
     sameAs: [
       "https://www.instagram.com/jujuyconecta",
       // agregá más redes si las tenés
