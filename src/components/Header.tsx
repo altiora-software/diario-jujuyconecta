@@ -227,14 +227,15 @@ const Header = () => {
               size="sm"
               className="hidden md:inline-flex shadow-sm"
             >
-              <Link
+              <a
                 href="https://jujuyconecta.com"
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 🚀 Ingresar a la plataforma
-              </Link>
+              </a>
             </Button>
+
 
             {/* Search desktop */}
             <form action="/buscar" method="GET" className="relative hidden sm:block">
@@ -284,16 +285,20 @@ const Header = () => {
               ))}
 
               <div className="px-4 pt-2 pb-3">
-                <Button asChild className="w-full">
-                  <Link
-                    href="https://jujuyconecta.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={closeMenu}
-                  >
-                    🚀 Ingresar a la plataforma
-                  </Link>
-                </Button>
+              <Button
+                asChild
+                size="sm"
+                className="hidden md:inline-flex shadow-sm"
+              >
+                <a
+                  href="https://jujuyconecta.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  🚀 Ingresar a la plataforma
+                </a>
+              </Button>
+
               </div>
             </nav>
           </div>
