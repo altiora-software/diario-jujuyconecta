@@ -117,11 +117,7 @@ export default function RootLayout({
     "@type": "NewsMediaOrganization",
     name: "Jujuy Conecta Diario",
     url: siteUrl,
-<<<<<<< HEAD
-    logo: `${siteUrl}/jc-loguito.png`,
-=======
     logo: `${siteUrl}jc.png`,
->>>>>>> main
     sameAs: [
       "https://www.instagram.com/jujuyconecta",
       // agregá más redes si las tenés
@@ -159,16 +155,11 @@ export default function RootLayout({
   return (
     <html lang="es">
       <head>
-<<<<<<< HEAD
-      <link rel="icon" href="/favicon.ico" />
-      <link rel="shortcut icon" href="/favicon.ico" />
-=======
         {/* Favicon e íconos principales */}
         <link rel="icon" href="/jc.ico" />
         <link rel="shortcut icon" href="/jc.ico" />
         <link rel="apple-touch-icon" href="/jc.png" />
 
->>>>>>> main
         {/* Google tag (gtag.js) */}
         <Script
           id="gtag-src"
