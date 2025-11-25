@@ -1,6 +1,7 @@
 'use client';
 
 import { Facebook, Instagram, Youtube, MessageCircle, Mail, MapPin, Phone } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 
 const socialLinks = [
@@ -36,10 +37,14 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12">
           {/* Logo y lema */}
           <div className="space-y-4">
-            <h2 className="text-3xl font-bold bg-gradient-to-r from-primary to-emerald-400 bg-clip-text text-transparent">
-              Jujuy Conecta
-            </h2>
-            <p className="text-slate-300 text-sm leading-relaxed">
+
+<h2 className="flex items-center gap-3 text-3xl font-bold">
+  <Image src="/jc-loguito.png" alt="Logo Jujuy Conecta" width={48} height={48} className="object-contain" />
+  <span className="bg-gradient-to-r from-primary to-emerald-400 bg-clip-text text-transparent">
+    Jujuy Conecta
+  </span>
+</h2>
+   <p className="text-slate-300 text-sm leading-relaxed">
               Información confiable desde Jujuy. Tu fuente de noticias locales y nacionales con
               credibilidad y compromiso.
             </p>

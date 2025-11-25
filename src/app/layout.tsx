@@ -11,6 +11,11 @@ const siteUrl =
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
+  icons: {
+    icon: "/favicon.ico",                // favicon clásico
+    shortcut: "/favicon.ico",            // atajo para navegadores antiguos
+    apple: "/apple-touch-icon.png",      // opcional: si querés soporte iOS (colocá este archivo en /public)
+  },
   title: {
     default:
       "Jujuy Conecta Diario | Noticias de Jujuy, Argentina y radio en vivo",
