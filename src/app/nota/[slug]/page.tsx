@@ -172,7 +172,7 @@ export default async function NoticiaPage({ params }: RouteParams) {
             )}
 
             {/* Contenido con ancho cómodo */}
-            <div className="mx-auto max-w-[72ch]">
+            <div className="mx-auto ">
               <div
                 className="prose prose-lg max-w-none text-foreground leading-relaxed prose-headings:text-foreground prose-a:text-primary"
                 dangerouslySetInnerHTML={{ __html: nota.contenido ?? "" }}

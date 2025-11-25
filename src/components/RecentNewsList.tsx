@@ -15,7 +15,7 @@ type NotaResumida = {
   created_at: string;
 };
 
-const MAX_NOTICIAS = 6;
+const MAX_NOTICIAS = 4;
 
 const RecentNewsList = () => {
   const [noticias, setNoticias] = useState<NotaResumida[]>([]);
@@ -73,7 +73,7 @@ const RecentNewsList = () => {
   return (
     <Card className="border border-news-border">
       <CardHeader>
-        <CardTitle className="text-base font-semibold text-headline-primary">
+        <CardTitle className="text-lg font-semibold text-headline-primary">
           Últimas noticias
         </CardTitle>
       </CardHeader>
@@ -128,7 +128,7 @@ const RecentNewsList = () => {
                       <p className="text-sm font-medium text-foreground group-hover:text-primary line-clamp-2 group-hover:line-clamp-none transition-all">
                         {nota.titulo}
                       </p>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-xs text-primary font-bold">
                         {fecha}
                       </p>
                     </div>

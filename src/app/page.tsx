@@ -6,6 +6,7 @@ import RadioPlayer from "@/components/RadioPlayer";
 import Ticker from "@/components/Ticker";
 import { Card, CardContent } from "@/components/ui/card";
 import type { Database } from "@/integrations/supabase/supabase";
+import RecentNewsList from "@/components/RecentNewsList";
 
 // 👇 Cliente SERVER-SIDE (después lo extraemos a helper compartido)
 const supabaseServer = createClient<Database>(
@@ -120,46 +121,7 @@ export default async function HomePage() {
             </article>
 
             <aside className="space-y-4">
-              {secundarias.map((nota) => {
-                const fecha = new Date(
-                  nota.fecha_publicacion ?? nota.created_at
-                ).toLocaleDateString("es-AR", {
-                  year: "numeric",
-                  month: "short",
-                  day: "numeric",
-                });
-
-                return (
-                  <Card
-                    key={nota.id}
-                    className="group overflow-hidden hover:bg-muted/60 transition-colors"
-                  >
-                    <Link
-                      href={`/nota/${nota.slug}`}
-                      className="flex gap-3 p-3"
-                    >
-                      {nota.imagen_url && (
-                        <div className="w-24 h-24 rounded-md overflow-hidden flex-shrink-0">
-                          <img
-                            src={nota.imagen_url}
-                            alt={nota.titulo}
-                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                          />
-                        </div>
-                      )}
-
-                      <div className="flex flex-col gap-1">
-                        <h3 className="text-sm font-semibold text-foreground line-clamp-2 group-hover:line-clamp-none transition-all">
-                          {nota.titulo}
-                        </h3>
-                        <time className="text-[11px] text-muted-foreground">
-                          {fecha}
-                        </time>
-                      </div>
-                    </Link>
-                  </Card>
-                );
-              })}
+              <RecentNewsList />
             </aside>
 
           </section>
@@ -214,11 +176,11 @@ export default async function HomePage() {
                           {nota.titulo}
                         </h3>
                         {nota.resumen && (
-                          <p className="text-sm text-muted-foreground mb-2 line-clamp-3">
+                          <p className="text-sm text-DEFAULT mb-2 line-clamp-3">
                             {nota.resumen}
                           </p>
                         )}
-                        <time className="text-xs text-muted-foreground mt-auto">
+                        <time className="text-xs text-primary font-bold mt-auto">
                           {new Date(
                             nota.fecha_publicacion ?? nota.created_at
                           ).toLocaleDateString("es-AR", {
