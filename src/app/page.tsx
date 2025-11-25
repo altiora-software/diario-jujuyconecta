@@ -39,7 +39,7 @@ export default async function HomePage() {
   const noticias: HomeNoticia[] = (data as HomeNoticia[]) ?? [];
 
   const principal = noticias[0] ?? null;
-  const secundarias = noticias.slice(1, 4);
+  const secundarias = noticias.slice(1, 5);
   const resto = noticias.slice(4);
 
   return (
@@ -62,7 +62,7 @@ export default async function HomePage() {
 
       {/* HERO DEL DIARIO, limpio y centrado como en la imagen 2 */}
       <section className="border-b bg-muted/40">
-        <div className="container mx-auto px-4 py-10">
+        <div className="container mx-auto px-4 py-2">
           <div className="max-w-3xl mx-auto text-center space-y-2">
             <h1 className="text-5xl md:text-6xl font-bold text-primary mb-4">
               Jujuy Conecta Diario
@@ -98,11 +98,11 @@ export default async function HomePage() {
                         {principal.titulo}
                       </h2>
                       {principal.resumen && (
-                        <p className="text-sm md:text-base text-muted-foreground line-clamp-3">
+                        <p className="text-sm md:text-base text-muted-DEFAULT line-clamp-3">
                           {principal.resumen}
                         </p>
                       )}
-                      <time className="text-xs text-muted-foreground">
+                      <time className="text-xs text-primary font-bold">
                         {new Date(
                           principal.fecha_publicacion ?? principal.created_at
                         ).toLocaleString("es-AR", {
