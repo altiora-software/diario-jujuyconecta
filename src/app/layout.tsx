@@ -82,14 +82,6 @@ export const metadata: Metadata = {
       "max-video-preview": -1,
     },
   },
-  icons: {
-    icon: [
-      { url: "/jc.ico", sizes: "any" },
-      { url: "/jc.png", type: "image/png" },
-    ],
-    shortcut: "/jc.ico",
-    apple: "/jc.png",
-  },
   other: {
     "theme-color": "#117A65",
     "application-name": "Jujuy Conecta Diario",
