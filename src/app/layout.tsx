@@ -12,19 +12,28 @@ const siteUrl =
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Jujuy Conecta Diario | Noticias de Jujuy, Argentina y radio en vivo",
+    default:
+      "Jujuy Conecta Diario | Noticias de Jujuy, Argentina y radio en vivo",
     template: "%s | Jujuy Conecta Diario",
   },
   description:
-    "Diario digital de Jujuy. Noticias provinciales y nacionales, transporte, obras, comunidad, deportes, cultura y radio en vivo.",
+    "Jujuy Conecta Diario es el diario digital de Jujuy. Noticias de último momento, análisis, radio en vivo, clima, tránsito, transporte público, obras, comunidad, deportes, cultura y agenda de la provincia.",
   keywords: [
     "Jujuy",
     "noticias Jujuy",
-    "diario digital",
+    "diario digital Jujuy",
     "Jujuy Conecta",
-    "radio en vivo",
+    "noticias de Jujuy hoy",
+    "radio en vivo Jujuy",
     "noticias provinciales",
     "noticias Argentina",
+    "actualidad Jujuy",
+    "clima Jujuy",
+    "tránsito Jujuy",
+    "transporte público Jujuy",
+    "deportes Jujuy",
+    "cultura Jujuy",
+    "agenda Jujuy",
   ],
   authors: [{ name: "Jujuy Conecta" }],
   creator: "Jujuy Conecta",
@@ -40,13 +49,13 @@ export const metadata: Metadata = {
     siteName: "Jujuy Conecta Diario",
     title: "Jujuy Conecta Diario | Noticias de Jujuy y radio en vivo",
     description:
-      "Noticias y actualidad de Jujuy y Argentina, con foco en la provincia, el transporte, la comunidad y las obras.",
+      "Noticias y actualidad de Jujuy y Argentina, con foco en la provincia, el transporte, el clima, la comunidad, las obras y la radio en vivo.",
     images: [
       {
-        url: "/og-diario.jpg", // poné una imagen 1200x630 en /public
+        url: "/og-diario.jpg", // 1200x630 en /public
         width: 1200,
         height: 630,
-        alt: "Jujuy Conecta Diario",
+        alt: "Jujuy Conecta Diario: noticias de Jujuy, Argentina y radio en vivo",
       },
     ],
   },
@@ -54,7 +63,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Jujuy Conecta Diario | Noticias de Jujuy y radio en vivo",
     description:
-      "Diario digital de Jujuy con noticias provinciales, nacionales y radio en vivo.",
+      "Diario digital de Jujuy con noticias provinciales, nacionales, clima, tránsito y radio en vivo.",
     images: ["/og-diario.jpg"],
   },
   robots: {
@@ -68,8 +77,27 @@ export const metadata: Metadata = {
       "max-video-preview": -1,
     },
   },
+  icons: {
+    icon: [
+      { url: "/jc.ico", sizes: "any" },
+      { url: "/jc.png", type: "image/png" },
+    ],
+    shortcut: "/jc.ico",
+    apple: "/jc.png",
+  },
   other: {
     "theme-color": "#117A65",
+    "application-name": "Jujuy Conecta Diario",
+    "apple-mobile-web-app-title": "Jujuy Conecta",
+    "apple-mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-status-bar-style": "black-translucent",
+    "format-detection": "telephone=no",
+    "geo.region": "AR-J",
+    "geo.placename": "San Salvador de Jujuy",
+    "geo.position": "-24.1858;-65.2995",
+    ICBM: "-24.1858, -65.2995",
+    "distribution": "global",
+    "rating": "general",
   },
 };
 
@@ -78,13 +106,13 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // JSON-LD básico para medio de noticias
-  const jsonLd = {
+  // JSON-LD para organización de noticias
+  const jsonLdOrg = {
     "@context": "https://schema.org",
     "@type": "NewsMediaOrganization",
     name: "Jujuy Conecta Diario",
     url: siteUrl,
-    logo: `${siteUrl}/jc-logo.png`,
+    logo: `${siteUrl}jc.png`,
     sameAs: [
       "https://www.instagram.com/jujuyconecta",
       // agregá más redes si las tenés
@@ -97,21 +125,55 @@ export default function RootLayout({
     },
   };
 
+  // JSON-LD para el sitio web completo
+  const jsonLdWebsite = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "Jujuy Conecta Diario",
+    url: siteUrl,
+    inLanguage: "es-AR",
+    description:
+      "Diario digital de Jujuy con noticias de último momento, radio en vivo y servicios útiles para la provincia.",
+    publisher: {
+      "@type": "Organization",
+      name: "Jujuy Conecta",
+      url: siteUrl,
+      logo: {
+        "@type": "ImageObject",
+        url: `${siteUrl}jc.png`,
+      },
+    },
+  };
+
+  const jsonLd = [jsonLdOrg, jsonLdWebsite];
+
   return (
     <html lang="es">
       <head>
+        {/* Favicon e íconos principales */}
+        <link rel="icon" href="/jc.ico" />
+        <link rel="shortcut icon" href="/jc.ico" />
+        <link rel="apple-touch-icon" href="/jc.png" />
+
         {/* Google tag (gtag.js) */}
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-KS718BB0WX"></script>
-        <script
+        <Script
+          id="gtag-src"
+          src="https://www.googletagmanager.com/gtag/js?id=G-KS718BB0WX"
+          strategy="afterInteractive"
+        />
+        <Script
+          id="gtag-init"
+          strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: `
               window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
+              function gtag(){window.dataLayer.push(arguments);}
               gtag('js', new Date());
               gtag('config', 'G-KS718BB0WX');
             `,
           }}
         />
+
         {/* Google AdSense */}
         <Script
           id="adsense-script"
@@ -120,9 +182,10 @@ export default function RootLayout({
           crossOrigin="anonymous"
           strategy="afterInteractive"
         />
-        {/* JSON-LD */}
+
+        {/* JSON-LD estructurado para Google News y SEO */}
         <Script
-          id="ld-news-org"
+          id="ld-json"
           type="application/ld+json"
           strategy="afterInteractive"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
