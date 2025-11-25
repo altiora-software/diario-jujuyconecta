@@ -236,7 +236,6 @@ const Header = () => {
               </a>
             </Button>
 
-
             {/* Search desktop */}
             <form action="/buscar" method="GET" className="relative hidden sm:block">
               <Search className="absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -247,7 +246,6 @@ const Header = () => {
                 className="pl-8 w-48 lg:w-64"
               />
             </form>
-
 
             {/* Botón menú mobile */}
             <Button

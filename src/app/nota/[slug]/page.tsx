@@ -7,7 +7,6 @@ import Comments from "@/components/Comments";
 import RecentNewsList from "@/components/RecentNewsList";
 import ShareButtons from "@/components/ShareButtons";
 
-
 type Nota = {
   id: number;
   titulo: string;
@@ -20,7 +19,6 @@ type Nota = {
   autor?: string | null;
   created_at: string;
 };
-
 
 // función común para no repetir la query
 async function getNotaBySlug(slug: string): Promise<Nota | null> {
