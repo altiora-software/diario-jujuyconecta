@@ -5,6 +5,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Providers } from "./providers";
+import { EnviarHistoriaSection } from "@/components/EnviarHistoriaSection";
 
 const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://jujuyconecta.online/";
@@ -192,6 +193,7 @@ export default function RootLayout({
         <Providers>
           <Header />
           <main className="min-h-screen">{children}</main>
+          <EnviarHistoriaSection />
           <Footer />
         </Providers>
       </body>
