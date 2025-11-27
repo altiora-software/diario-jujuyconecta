@@ -5,6 +5,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Providers } from "./providers";
+import { EnviarHistoriaSection } from "@/components/EnviarHistoriaSection";
 
 const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://jujuyconecta.online/";
@@ -12,9 +13,9 @@ const siteUrl =
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   icons: {
-    icon: "/favicon.ico",                // favicon clásico
-    shortcut: "/favicon.ico",            // atajo para navegadores antiguos
-    apple: "/apple-touch-icon.png",      // opcional: si querés soporte iOS (colocá este archivo en /public)
+    icon: "/jc.ico",
+    shortcut: "/jc.ico",
+    apple: "/jc.png",
   },
   title: {
     default:
@@ -172,13 +173,13 @@ export default function RootLayout({
         />
 
         {/* Google AdSense */}
-        <Script
+        {/* <Script
           id="adsense-script"
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2751071957273972"
           crossOrigin="anonymous"
           strategy="afterInteractive"
-        />
+        /> */}
 
         {/* JSON-LD estructurado para Google News y SEO */}
         <Script
@@ -192,6 +193,7 @@ export default function RootLayout({
         <Providers>
           <Header />
           <main className="min-h-screen">{children}</main>
+          <EnviarHistoriaSection />
           <Footer />
         </Providers>
       </body>
