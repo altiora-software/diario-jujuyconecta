@@ -25,15 +25,17 @@ type NoticiaViewProps = {
   nota: Nota;
 };
 
+/* Usar la variable pública como base de URLs (fallback seguro) */
+const SITE_BASE = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://diario.jujuyconecta.com").replace(/\/$/, "");
+
 export function NoticiaView({ nota }: NoticiaViewProps) {
   const [isLogged, setIsLogged] = useState(false);
   const [fromAdmin, setFromAdmin] = useState(false);
   const pathname = usePathname();
 
-  // Chequeo de sesión (como antes)
-  useEffect(() => { 
-    supabase.auth.getUser().then((result: { data: { user: any; }; }) => {
-      const user = (result.data && 'user' in result.data) ? result.data.user : undefined;
+  useEffect(() => {
+    supabase.auth.getUser().then((result: { data: { user: any } }) => {
+      const user = (result.data && "user" in result.data) ? result.data.user : undefined;
       setIsLogged(!!user);
     });
   }, []);
@@ -61,7 +63,7 @@ export function NoticiaView({ nota }: NoticiaViewProps) {
       (nota.contenido
         ? nota.contenido.replace(/<[^>]+>/g, "").slice(0, 160)
         : ""),
-    image: nota.imagen_url ? [nota.imagen_url] : undefined,
+    image: nota.imagen_url ? [ (nota.imagen_url.startsWith("http") ? nota.imagen_url : new URL(nota.imagen_url, SITE_BASE).toString()) ] : undefined,
     author: nota.autor
       ? { "@type": "Person", name: nota.autor }
       : { "@type": "Organization", name: "Jujuy Conecta Diario" },
@@ -70,12 +72,12 @@ export function NoticiaView({ nota }: NoticiaViewProps) {
       name: "Jujuy Conecta Diario",
       logo: {
         "@type": "ImageObject",
-        url: "https://jujuyconecta.online/diario/jc-logo.png",
+        url: new URL("/diario/jc-logo.png", SITE_BASE).toString(),
       },
     },
     mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": `https://jujuyconecta.online/diario/nota/${nota.slug}`,
+      "@id": new URL(`/nota/${nota.slug}`, SITE_BASE).toString(),
     },
   };
 
@@ -87,19 +89,19 @@ export function NoticiaView({ nota }: NoticiaViewProps) {
         "@type": "ListItem",
         position: 1,
         name: "Inicio",
-        item: "https://jujuyconecta.online/diario",
+        item: new URL("/", SITE_BASE).toString(),
       },
       {
         "@type": "ListItem",
         position: 2,
         name: "Noticias",
-        item: "https://jujuyconecta.online/diario",
+        item: new URL("/", SITE_BASE).toString(),
       },
       {
         "@type": "ListItem",
         position: 3,
         name: nota.titulo,
-        item: `https://jujuyconecta.online/diario/nota/${nota.slug}`,
+        item: new URL(`/nota/${nota.slug}`, SITE_BASE).toString(),
       },
     ],
   };
@@ -185,6 +187,7 @@ export function NoticiaView({ nota }: NoticiaViewProps) {
             </div>
           </aside>
         </div>
+
         <Script
           id="ld-article"
           type="application/ld+json"
