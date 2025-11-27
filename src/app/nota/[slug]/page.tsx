@@ -7,7 +7,6 @@ import Comments from "@/components/Comments";
 import RecentNewsList from "@/components/RecentNewsList";
 import ShareButtons from "@/components/ShareButtons";
 
-
 type Nota = {
   id: number;
   titulo: string;
@@ -21,6 +20,8 @@ type Nota = {
   created_at: string;
 };
 
+/* helper: obtener base absoluta desde env pública */
+const SITE_BASE = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://diario.jujuyconecta.com").replace(/\/$/, "");
 
 // función común para no repetir la query
 async function getNotaBySlug(slug: string): Promise<Nota | null> {
@@ -59,8 +60,8 @@ export async function generateMetadata(
     };
   }
 
-  const previousImages = (await parent).openGraph?.images || [];
-  const url = `/nota/${nota.slug}`;
+  // PRECAUCIÓN: hay que usar URL absoluta para canonical / og:url
+  const url = new URL(`/nota/${nota.slug}`, SITE_BASE).toString();
 
   const description =
     nota.resumen ??
@@ -68,8 +69,22 @@ export async function generateMetadata(
 
   const published = nota.fecha_publicacion || nota.created_at;
 
+  // Asegurá que la imagen sea absoluta
+  const images = nota.imagen_url
+    ? [
+        {
+          url: nota.imagen_url.startsWith("http")
+            ? nota.imagen_url
+            : new URL(nota.imagen_url, SITE_BASE).toString(),
+          width: 1200,
+          height: 630,
+          alt: nota.titulo,
+        },
+      ]
+    : (await parent).openGraph?.images ?? [];
+
   return {
-    title: nota.titulo,
+    title: `${nota.titulo} | Jujuy Conecta Diario`,
     description,
     alternates: {
       canonical: url,
@@ -82,29 +97,19 @@ export async function generateMetadata(
       publishedTime: published,
       modifiedTime: nota.created_at,
       siteName: "Jujuy Conecta Diario",
-      images: nota.imagen_url
-        ? [
-            {
-              url: nota.imagen_url,
-              width: 1200,
-              height: 630,
-              alt: nota.titulo,
-            },
-          ]
-        : previousImages,
+      images,
     },
     twitter: {
       card: "summary_large_image",
       title: nota.titulo,
       description,
-      images: nota.imagen_url ? [nota.imagen_url] : undefined,
+      images: images.length ? images.map((i) => (typeof i === "string" ? i : i.url)) : undefined,
     },
   };
 }
 
 // ------- Página de la noticia --------
 export default async function NoticiaPage({ params }: RouteParams) {
-  // 👉 ESTO es lo que te marcaba el error: hay que hacer await
   const { slug } = await params;
 
   const nota = await getNotaBySlug(slug);
@@ -154,7 +159,6 @@ export default async function NoticiaPage({ params }: RouteParams) {
 
             {nota.imagen_url && (
               <figure className="mb-8 rounded-lg overflow-hidden border border-news-border">
-                {/* podrías migrar a next/image después, pero esto funciona ya */}
                 <img
                   src={nota.imagen_url}
                   alt={nota.titulo}
@@ -171,18 +175,14 @@ export default async function NoticiaPage({ params }: RouteParams) {
               </div>
             )}
 
-            {/* Contenido con ancho cómodo */}
             <div className="mx-auto ">
               <div
                 className="prose prose-lg max-w-none text-foreground leading-relaxed prose-headings:text-foreground prose-a:text-primary"
                 dangerouslySetInnerHTML={{ __html: nota.contenido ?? "" }}
               />
               <ShareButtons titulo={nota.titulo} slug={nota.slug} />
-              {/* Rating */}
-            <RatingStars noticiaId={nota.id} />
-
-            {/* Comentarios */}
-            <Comments noticiaId={nota.id} />
+              <RatingStars noticiaId={nota.id} />
+              <Comments noticiaId={nota.id} />
             </div>
           </article>
 
