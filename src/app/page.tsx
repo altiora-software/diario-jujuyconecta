@@ -7,6 +7,8 @@ import Ticker from "@/components/Ticker";
 import { Card, CardContent } from "@/components/ui/card";
 import type { Database } from "@/integrations/supabase/supabase";
 import RecentNewsList from "@/components/RecentNewsList";
+import MarketplaceBanner from "@/components/MarketplaceBanner";
+import CategoryNewsBlock from "@/components/CategoryNewsBlock";
 
 // 👇 Cliente SERVER-SIDE (después lo extraemos a helper compartido)
 const supabaseServer = createClient<Database>(
@@ -75,6 +77,8 @@ export default async function HomePage() {
         </div>
       </section>
 
+   
+
       <main className="container mx-auto px-4 py-8 space-y-10">
         {principal && (
           <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -127,6 +131,9 @@ export default async function HomePage() {
           </section>
         )}
 
+           {/* BANNER  marketplace*/}
+      <MarketplaceBanner />
+
         {!principal && !error && (
           <section className="py-20 text-center">
             <p className="text-muted-foreground">
@@ -143,7 +150,7 @@ export default async function HomePage() {
           </section>
         )}
 
-        {resto.length > 0 && (
+        {/* {resto.length > 0 && (
           <section className="space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-semibold text-foreground">
@@ -196,7 +203,48 @@ export default async function HomePage() {
               ))}
             </div>
           </section>
-        )}
+        )} */}
+
+<div className="container mx-auto mt-10">
+
+<CategoryNewsBlock
+  categorySlug="provinciales"
+  titulo="Provinciales"
+  limit={6}
+/>
+
+<CategoryNewsBlock
+  categorySlug="actualidad"
+  titulo="Actualidad"
+  limit={6}
+/>
+
+<CategoryNewsBlock
+  categorySlug="deportes"
+  titulo="Deportes"
+  limit={6}
+/>
+
+<CategoryNewsBlock
+  categorySlug="cultura"
+  titulo="Cultura"
+  limit={6}
+/>
+
+<CategoryNewsBlock
+  categorySlug="economia"
+  titulo="Economía"
+  limit={6}
+/>
+
+{/* Más noticias generales */}
+<section className="mt-12">
+  <h2 className="text-xl font-bold mb-4">Más noticias</h2>
+  <RecentNewsList />
+</section>
+
+</div>
+
       </main>
     </div>
   );
