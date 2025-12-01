@@ -6,6 +6,7 @@ import RatingStars from "@/components/RatingStars";
 import Comments from "@/components/Comments";
 import RecentNewsList from "@/components/RecentNewsList";
 import ShareButtons from "@/components/ShareButtons";
+import MarketplaceSidebarBanner from "@/components/MarketplaceSidebarBanner";
 
 type Nota = {
   id: number;
@@ -132,13 +133,7 @@ export default async function NoticiaPage({ params }: RouteParams) {
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
           {/* MAIN */}
           <article className="xl:col-span-8 mx-auto w-full">
-            <a
-              href="/"
-              className="inline-flex items-center gap-2 text-primary hover:underline mb-6"
-            >
-              ← Volver al inicio
-            </a>
-
+         
             <header className="mb-8">
               <h1 className="text-4xl md:text-5xl font-bold text-headline-primary mb-4 leading-tight">
                 {nota.titulo}
@@ -180,6 +175,13 @@ export default async function NoticiaPage({ params }: RouteParams) {
                 className="prose prose-lg max-w-none text-foreground leading-relaxed prose-headings:text-foreground prose-a:text-primary"
                 dangerouslySetInnerHTML={{ __html: nota.contenido ?? "" }}
               />
+                 <a
+              href="/"
+              className="inline-flex items-center gap-2 text-primary hover:underline mt-8 mb-6"
+            >
+              ← Volver al inicio
+            </a>
+
               <ShareButtons titulo={nota.titulo} slug={nota.slug} />
               <RatingStars noticiaId={nota.id} />
               <Comments noticiaId={nota.id} />
@@ -188,9 +190,12 @@ export default async function NoticiaPage({ params }: RouteParams) {
 
           {/* ASIDE */}
           <aside className="xl:col-span-4">
-            <div className="sticky top-28">
+            <div className="sticky top-28 space-y-4">
+               {/* banner aside  */}
               <RecentNewsList />
-            </div>
+              <MarketplaceSidebarBanner />
+             </div>
+             
           </aside>
         </div>
       </main>
