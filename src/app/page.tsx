@@ -9,6 +9,7 @@ import type { Database } from "@/integrations/supabase/supabase";
 import RecentNewsList from "@/components/RecentNewsList";
 import MarketplaceBanner from "@/components/MarketplaceBanner";
 import CategoryNewsBlock from "@/components/CategoryNewsBlock";
+import CosquinPromoBannerDiario from "@/components/CosquinLineup/CosquinPromoBannerDiario";
 
 // 👇 Cliente SERVER-SIDE (después lo extraemos a helper compartido)
 const supabaseServer = createClient<Database>(
@@ -132,8 +133,7 @@ export default async function HomePage() {
         )}
 
            {/* BANNER  marketplace*/}
-      <MarketplaceBanner />
-
+        <MarketplaceBanner />
         {!principal && !error && (
           <section className="py-20 text-center">
             <p className="text-muted-foreground">
@@ -205,46 +205,46 @@ export default async function HomePage() {
           </section>
         )} */}
 
-<div className="container mx-auto mt-10">
+        <div className="container mx-auto mt-10">
 
-<CategoryNewsBlock
-  categorySlug="provinciales"
-  titulo="Provinciales"
-  limit={6}
-/>
+        <CategoryNewsBlock
+          categorySlug="provinciales"
+          titulo="Provinciales"
+          limit={6}
+        />
 
-<CategoryNewsBlock
-  categorySlug="actualidad"
-  titulo="Actualidad"
-  limit={6}
-/>
+        <CategoryNewsBlock
+          categorySlug="actualidad"
+          titulo="Actualidad"
+          limit={6}
+        />
 
-<CategoryNewsBlock
-  categorySlug="deportes"
-  titulo="Deportes"
-  limit={6}
-/>
+        <CategoryNewsBlock
+          categorySlug="deportes"
+          titulo="Deportes"
+          limit={6}
+        />
 
-<CategoryNewsBlock
-  categorySlug="cultura"
-  titulo="Cultura"
-  limit={6}
-/>
+        <CategoryNewsBlock
+          categorySlug="cultura"
+          titulo="Cultura"
+          limit={6}
+        />
 
-<CategoryNewsBlock
-  categorySlug="economia"
-  titulo="Economía"
-  limit={6}
-/>
+        <CategoryNewsBlock
+          categorySlug="economia"
+          titulo="Economía"
+          limit={6}
+        />
+  
+        <CosquinPromoBannerDiario />
+        {/* Más noticias generales */}
+        <section className="mt-12">
+          <h2 className="text-xl font-bold mb-4">Más noticias</h2>
+          <RecentNewsList />
+        </section>
 
-{/* Más noticias generales */}
-<section className="mt-12">
-  <h2 className="text-xl font-bold mb-4">Más noticias</h2>
-  <RecentNewsList />
-</section>
-
-</div>
-
+        </div>  
       </main>
     </div>
   );
