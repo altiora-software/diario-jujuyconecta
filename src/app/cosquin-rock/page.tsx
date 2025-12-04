@@ -1,5 +1,8 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import CosquinLineup from "@/components/CosquinLineup/CosquinLineUp";
+import {CosquinTicketsSection} from "@/components/CosquinLineup/CosquinTicketsSection";
 
 type TimeLeft = {
   days: number;
@@ -23,9 +26,18 @@ function getTimeLeft(): TimeLeft {
 }
 
 const CosquinRock2026Diario = () => {
-  const [timeLeft, setTimeLeft] = useState<TimeLeft>(getTimeLeft());
+  // Estado inicial estable para evitar descalce de SSR
+  const [timeLeft, setTimeLeft] = useState<TimeLeft>({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+  });
 
   useEffect(() => {
+    // Primer cálculo solo en cliente
+    setTimeLeft(getTimeLeft());
+
     const interval = setInterval(() => {
       setTimeLeft(getTimeLeft());
     }, 1000);
@@ -41,15 +53,16 @@ const CosquinRock2026Diario = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900">
+    // pt-4 para que no se pegue con la navbar del diario si es fija
+    <div className="min-h-screen bg-slate-50 text-slate-900 pt-4 md:pt-6">
       {/* HERO / CABECERA DE NOTA */}
       <section className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-6xl flex-col gap-8 px-4 py-10 md:flex-row md:px-6 lg:px-8">
+        <div className="mx-auto flex max-w-6xl flex-col gap-8 px-4 py-8 sm:py-10 md:flex-row md:px-6 lg:px-8">
           <div className="flex-1 space-y-3">
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-700">
               Verano 2026 · Cobertura especial
             </p>
-            <h1 className="text-3xl font-black leading-tight md:text-4xl lg:text-[2.7rem]">
+            <h1 className="text-2xl font-black leading-tight sm:text-3xl md:text-4xl lg:text-[2.7rem]">
               Cosquín Rock 2026: cómo se prepara el festival y qué deben saber
               los jujeños que viajan a Punilla
             </h1>
@@ -57,25 +70,25 @@ const CosquinRock2026Diario = () => {
               El histórico encuentro musical tendrá una nueva edición el 14 y 15
               de febrero en el Aeródromo Santa María de Punilla, Córdoba.
               Jujuy Conecta reúne en un solo lugar la información esencial para
-              la audiencia del NOA: grilla, viaje, ubicación y cobertura
+              la audiencia del NOA, grilla, viaje, ubicación y cobertura
               especial.
             </p>
 
             {/* Countdown compacto estilo diario */}
-            <div className="mt-3 inline-flex flex-wrap items-center gap-4 rounded-full border border-emerald-100 bg-emerald-50 px-4 py-2">
-              <span className="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-emerald-800">
+            <div className="mt-3 inline-flex flex-wrap items-center gap-3 rounded-full border border-emerald-100 bg-emerald-50 px-3 py-2 sm:px-4 sm:py-2.5">
+              <span className="text-[0.65rem] sm:text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-emerald-800">
                 Falta cada vez menos
               </span>
               <div className="flex items-center gap-2 text-center">
                 {countdownBlocks.map((item) => (
                   <div
                     key={item.label}
-                    className="px-2 py-1 rounded-full bg-white shadow-sm"
+                    className="px-2 py-1 rounded-full bg-white shadow-sm min-w-[3.2rem]"
                   >
-                    <div className="text-sm font-bold tabular-nums text-slate-900">
+                    <div className="text-sm sm:text-base font-bold tabular-nums text-slate-900">
                       {item.value.toString().padStart(2, "0")}
                     </div>
-                    <div className="text-[0.6rem] uppercase tracking-[0.14em] text-slate-500">
+                    <div className="text-[0.55rem] sm:text-[0.6rem] uppercase tracking-[0.14em] text-slate-500">
                       {item.label}
                     </div>
                   </div>
@@ -85,9 +98,9 @@ const CosquinRock2026Diario = () => {
           </div>
 
           {/* Foto + ficha técnica al estilo recuadro de diario */}
-          <aside className="w-full max-w-sm self-start rounded-2xl border border-slate-200 bg-slate-50/60 shadow-sm overflow-hidden">
+          <aside className="w-full max-w-sm self-stretch rounded-2xl border border-slate-200 bg-slate-50/60 shadow-sm overflow-hidden">
             <div
-              className="h-40 w-full bg-cover bg-center"
+              className="h-36 sm:h-40 w-full bg-cover bg-center"
               style={{
                 backgroundImage:
                   "url('https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg?auto=compress&cs=tinysrgb&w=1600')",
@@ -131,7 +144,7 @@ const CosquinRock2026Diario = () => {
       <main className="mx-auto max-w-5xl px-4 py-10 space-y-14 md:px-6 lg:px-0">
         {/* Introducción / contexto */}
         <section className="space-y-4">
-          <h2 className="text-xl md:text-2xl font-bold">
+          <h2 className="text-lg sm:text-xl md:text-2xl font-bold">
             Un clásico del verano cordobés con público jujeño asegurado
           </h2>
           <p className="text-sm md:text-base leading-relaxed text-slate-700">
@@ -143,7 +156,7 @@ const CosquinRock2026Diario = () => {
           </p>
           <p className="text-sm md:text-base leading-relaxed text-slate-700">
             Desde Jujuy Conecta, la cobertura se centra en las necesidades de la
-            audiencia jujeña: cómo organizar el viaje, qué tener en cuenta en el
+            audiencia jujeña, cómo organizar el viaje, qué tener en cuenta en el
             predio, qué artistas se perfilan como infaltables y de qué manera
             seguir el minuto a minuto desde la provincia.
           </p>
@@ -151,7 +164,7 @@ const CosquinRock2026Diario = () => {
 
         {/* Módulo visual: grilla interactiva estilo Cosquín */}
         <section className="space-y-4">
-          <h2 className="text-xl md:text-2xl font-bold">
+          <h2 className="text-lg sm:text-xl md:text-2xl font-bold">
             Line up completo y bandas destacadas
           </h2>
           <p className="text-sm md:text-base leading-relaxed text-slate-700">
@@ -161,15 +174,16 @@ const CosquinRock2026Diario = () => {
             algunos de los shows de mayor peso en la programación.
           </p>
           <CosquinLineup />
-        </section>
+        </section> 
+        <CosquinTicketsSection />
 
         {/* Cómo viajar desde Jujuy */}
         <section className="space-y-5">
-          <h2 className="text-xl md:text-2xl font-bold">
+          <h2 className="text-lg sm:text-xl md:text-2xl font-bold">
             Cómo viajar desde Jujuy al Cosquín Rock
           </h2>
           <p className="text-sm md:text-base text-slate-700 max-w-3xl">
-            El viaje forma parte de la experiencia: ruta, amigos, música y
+            El viaje forma parte de la experiencia, ruta, amigos, música y
             organización previa. Aquí, un panorama general de las opciones más
             utilizadas por el público jujeño. Los horarios y tarifas pueden
             variar, por lo que se recomienda consultar siempre con las empresas
@@ -203,10 +217,10 @@ const CosquinRock2026Diario = () => {
 
             <article className="rounded-2xl border border-slate-200 bg-white p-5 text-sm shadow-sm">
               <h3 className="text-base font-bold mb-2 text-emerald-800">
-                Avión + traslado
+                Avión más traslado
               </h3>
               <p className="text-slate-700 leading-relaxed">
-                Una alternativa más rápida para quienes priorizan comodidad:
+                Una alternativa más rápida para quienes priorizan comodidad,
                 vuelos a Córdoba capital y, desde allí, traslados en combis,
                 remises o vehículos de alquiler hacia Santa María de Punilla.
               </p>
@@ -216,12 +230,12 @@ const CosquinRock2026Diario = () => {
 
         {/* Cobertura Jujuy Conecta como medio */}
         <section className="space-y-5">
-          <h2 className="text-xl md:text-2xl font-bold">
+          <h2 className="text-lg sm:text-xl md:text-2xl font-bold">
             Cómo será la cobertura de Jujuy Conecta
           </h2>
           <p className="text-sm md:text-base text-slate-700 max-w-3xl">
             El equipo de Jujuy Conecta realizará una cobertura especial pensada
-            para la audiencia del norte: crónicas, material audiovisual y
+            para la audiencia del norte, crónicas, material audiovisual y
             contenidos útiles para quienes viajan o siguen el evento a
             distancia.
           </p>
@@ -263,15 +277,15 @@ const CosquinRock2026Diario = () => {
 
           <p className="text-xs text-slate-500">
             Además, en la plataforma principal de Jujuy Conecta se publicará
-            una guía interactiva con módulos especiales para el festival
-            (transporte, experiencias y contenidos multimedia).
+            una guía interactiva con módulos especiales para el festival,
+            transporte, experiencias y contenidos multimedia.
           </p>
         </section>
 
         {/* Ubicación / mapa */}
         <section className="space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <h2 className="text-xl md:text-2xl font-bold">
+            <h2 className="text-lg sm:text-xl md:text-2xl font-bold">
               Dónde se realiza el festival
             </h2>
             <a
@@ -289,7 +303,7 @@ const CosquinRock2026Diario = () => {
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d4044.576240819121!2d-64.4560639!3d-31.284454899999997!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x942d7bfb5e944355%3A0x71c7e2a8989edd10!2sAeroclub%20Santa%20Mar%C3%ADa%20de%20Punilla!5e1!3m2!1ses-419!2sar!4v1764863432208!5m2!1ses-419!2sar"
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
-              className="h-72 w-full border-0"
+              className="h-64 sm:h-72 w-full border-0"
             />
           </div>
         </section>
@@ -298,7 +312,7 @@ const CosquinRock2026Diario = () => {
         <section className="border-t border-slate-200 pt-6">
           <p className="text-[0.7rem] text-slate-500 leading-relaxed">
             Cosquín Rock es una marca registrada de sus respectivos titulares.
-            Jujuy Conecta no organiza el evento ni vende entradas; únicamente
+            Jujuy Conecta no organiza el evento ni vende entradas, únicamente
             brinda información periodística para la comunidad del NOA. La
             compra de tickets, las condiciones de ingreso y cualquier cambio de
             programación deben consultarse siempre en los canales oficiales del

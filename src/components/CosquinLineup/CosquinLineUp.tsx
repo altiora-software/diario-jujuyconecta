@@ -1,3 +1,4 @@
+"use client"
 import React from "react";
 import clsx from "clsx";
 
@@ -70,7 +71,7 @@ const randomColor = () => {
     "text-[#ffe066]", // amarillo
     "text-[#7dd3fc]", // celeste
     "text-[#c4f372]", // verde lima
-    "text-[#fbbf77]", // naranja suave
+    "text-[#c4f372]", // naranja suave
     "text-[#b9a6ff]", // lila
   ];
   return colors[Math.floor(Math.random() * colors.length)];
