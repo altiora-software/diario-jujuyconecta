@@ -27,6 +27,7 @@ const quickLinks = [
   { name: "Política", path: "/seccion/politica" },
   { name: "Economía", path: "/seccion/economia" },
   { name: "Deportes", path: "/seccion/deportes" },
+  { name: "Vivi Cosquik Rock 2026", path: "/seccion/cosquin-rock" },
 ];
 
 export default function Footer() {
