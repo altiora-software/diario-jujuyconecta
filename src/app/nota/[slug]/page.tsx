@@ -9,6 +9,7 @@ import Comments from "@/components/Comments";
 import RecentNewsList from "@/components/RecentNewsList";
 import ShareButtons from "@/components/ShareButtons";
 import MarketplaceSidebarBanner from "@/components/MarketplaceSidebarBanner";
+import HighlightedRelatedStory from "@/components/HighlightedRelatedStory";
 
 type Nota = {
   id: number;
@@ -267,13 +268,15 @@ export default async function NoticiaPage({ params }: RouteParams) {
                 </p>
               </div>
             )}
-
             <div className="mx-auto">
               <div
                 className="prose prose-lg max-w-none text-foreground leading-relaxed prose-headings:text-foreground prose-a:text-primary"
                 dangerouslySetInnerHTML={{ __html: nota.contenido ?? "" }}
               />
-
+              <HighlightedRelatedStory
+                noticiaId={nota.id}
+                categoriaId={nota.categoria_id}
+              />
               <a
                 href="/"
                 className="inline-flex items-center gap-2 text-primary hover:underline mt-8 mb-6"
