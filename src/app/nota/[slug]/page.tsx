@@ -117,7 +117,7 @@ export async function generateMetadata(
       title: nota.titulo,
       description,
       images: images.length
-        ? images.map((i) => (typeof i === "string" ? i : i.url))
+        ? images.map((i) => (typeof i === "string" ? i : url))
         : undefined,
     },
   };
