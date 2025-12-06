@@ -69,23 +69,23 @@ export default function MarketplaceBanner() {
             </div>
 
     
-            {/* Right: Visual */}
-<div className=" lg:col-span-5 flex items-center justify-center">
-  <div className="w-full max-w-[320px]">
-    <div className="relative rounded-xl bg-white/3 border border-white/6 p-3">
-      <div className="relative h-40 w-full rounded-md overflow-hidden">
-        <Image
-          src="/jc-banner.png"        // archivo en public/
-          alt="Mapa y emprendimientos de Jujuy Conecta"
-          fill                                 // hace que ocupe todo el contenedor relativo
-          sizes="(min-width: 1024px) 320px, (min-width: 640px) 280px, 220px"
-          style={{ objectFit: "cover" }}       // object-cover
-          priority={false}                     // poné true si querés que cargue inmediatamente
-        />
-      </div>
-    </div>
-  </div>
-</div>
+                        {/* Right: Visual */}
+            <div className=" lg:col-span-5 flex items-center justify-center">
+              <div className="w-full max-w-[320px]">
+                <div className="relative rounded-xl bg-white/3 border border-white/6 p-3">
+                  <div className="relative h-40 w-full rounded-md overflow-hidden">
+                    <Image
+                      src="/jc-banner.png"        // archivo en public/
+                      alt="Mapa y emprendimientos de Jujuy Conecta"
+                      fill                                 // hace que ocupe todo el contenedor relativo
+                      sizes="(min-width: 1024px) 320px, (min-width: 640px) 280px, 220px"
+                      style={{ objectFit: "cover" }}       // object-cover
+                      priority={false}                     // poné true si querés que cargue inmediatamente
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
 
           </div>
         </motion.div>

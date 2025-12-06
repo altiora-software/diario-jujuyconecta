@@ -17,6 +17,7 @@ export function EnviarHistoriaSection() {
           alt="Paisaje de Jujuy"
           fill
           priority
+          sizes="100vw"
           className="object-cover object-center brightness-[0.8]"
         />
         {/* leve overlay para lectura */}

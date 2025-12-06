@@ -40,7 +40,7 @@ export default function Footer() {
           <div className="space-y-4">
 
 <h2 className="flex items-center gap-3 text-3xl font-bold">
-  <Image src="/jc-loguito.png" alt="Logo Jujuy Conecta" width={48} height={48} className="object-contain" />
+  <Image src="/jc-loguito.png" alt="Logo Jujuy Conecta" width={48} height={48} className="object-contain" sizes="100vw" />
   <span className="bg-gradient-to-r from-primary to-emerald-400 bg-clip-text text-transparent">
     Jujuy Conecta
   </span>

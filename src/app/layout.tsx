@@ -8,8 +8,8 @@ import { Providers } from "./providers";
 import { EnviarHistoriaSection } from "@/components/EnviarHistoriaSection";
 
 const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://jujuyconecta.online/";
-
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://diario.jujuyconecta.com/";
+  
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   icons: {
@@ -141,17 +141,23 @@ export default function RootLayout({
         url: `${siteUrl}jc.png`,
       },
     },
+    potentialAction: {
+      "@type": "SearchAction",
+      target: `${siteUrl}buscar?q={search_term_string}`,
+      "query-input": "required name=search_term_string",
+    },
   };
+  
 
   const jsonLd = [jsonLdOrg, jsonLdWebsite];
 
   return (
-    <html lang="es">
+    <html lang="es-AR">
       <head>
         {/* Favicon e íconos principales */}
-        <link rel="icon" href="/jc.ico" />
-        <link rel="shortcut icon" href="/jc.ico" />
-        <link rel="apple-touch-icon" href="/jc.png" />
+        <link rel="preconnect" href="https://www.googletagmanager.com" />
+        <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+
 
         {/* Google tag (gtag.js) */}
         <Script
