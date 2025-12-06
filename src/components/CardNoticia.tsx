@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Clock, Eye } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { getOptimizedNewsImageUrl, CardVariant } from "@/lib/news-images";
 
 interface CardNoticiaProps {
   noticia: {
@@ -9,12 +10,12 @@ interface CardNoticiaProps {
     slug: string;
     titulo: string;
     subtitulo?: string;
-    imagen_url: string;   // idealmente URL optimizada o thumb de Supabase
+    imagen_url: string;   // URL cruda de Supabase o externa
     categoria: string;
     fecha: string;
     vistas?: number;
   };
-  variant?: "hero" | "secondary" | "small" | "list";
+  variant?: CardVariant;
 }
 
 const CardNoticia = ({ noticia, variant = "small" }: CardNoticiaProps) => {
@@ -22,7 +23,9 @@ const CardNoticia = ({ noticia, variant = "small" }: CardNoticiaProps) => {
   const isSecondary = variant === "secondary";
   const isList = variant === "list";
 
-  const hasImage = Boolean(noticia.imagen_url);
+  // Acá convertimos la URL cruda en una URL optimizada
+  const optimizedImageUrl = getOptimizedNewsImageUrl(noticia.imagen_url, variant);
+  const hasImage = Boolean(optimizedImageUrl);
 
   // Definimos tamaños para <Image> según variant
   const imageSizes =
@@ -39,7 +42,7 @@ const CardNoticia = ({ noticia, variant = "small" }: CardNoticiaProps) => {
       <Card className="overflow-hidden card-hover border-news-border">
         <CardContent className={`p-0 ${isList ? "flex flex-row" : "flex flex-col"}`}>
           {/* IMAGEN */}
-          {hasImage && (
+          {hasImage && optimizedImageUrl && (
             <div
               className={`relative overflow-hidden ${
                 isHero
@@ -52,7 +55,7 @@ const CardNoticia = ({ noticia, variant = "small" }: CardNoticiaProps) => {
               }`}
             >
               <Image
-                src={noticia.imagen_url}
+                src={optimizedImageUrl}
                 alt={noticia.titulo}
                 fill
                 sizes={imageSizes}

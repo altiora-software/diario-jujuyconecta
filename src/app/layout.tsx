@@ -88,6 +88,7 @@ export const metadata: Metadata = {
     "application-name": "Jujuy Conecta Diario",
     "apple-mobile-web-app-title": "Jujuy Conecta",
     "apple-mobile-web-app-capable": "yes",
+    "mobile-web-app-capable": "yes",
     "apple-mobile-web-app-status-bar-style": "black-translucent",
     "format-detection": "telephone=no",
     "geo.region": "AR-J",
@@ -97,6 +98,7 @@ export const metadata: Metadata = {
     "distribution": "global",
     "rating": "general",
   },
+  
 };
 
 export default function RootLayout({

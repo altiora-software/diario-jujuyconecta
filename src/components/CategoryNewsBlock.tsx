@@ -44,6 +44,7 @@ export default async function CategoryNewsBlock({ categorySlug, titulo, limit = 
               {n.imagen_url && (
                 <img
                   src={n.imagen_url}
+                  alt="imagen"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                 />
               )}
