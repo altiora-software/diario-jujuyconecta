@@ -58,16 +58,21 @@ export default function Header() {
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           <Link href="/" className="flex items-center space-x-3">
-            <img src="/jc-loguito.png" alt="Jujuy Conecta" className="h-10 w-10 rounded-full" />
-            <div className="flex md:hidden lg:flex flex-col leading-tight">
-              {/* Visible en mobile y lg+, oculto en md (tablet) */}
-              <span className="text-2xl font-bold text-primary">Jujuy Conecta</span>
-              <span className="text-xs text-text-secondary">Diario Digital</span>
-            </div>
+            <img src="/jc-navidad.png" alt="Jujuy Conecta" className="h-12 w-12" />
+            <div className="flex flex-col leading-tight">
+  <span className="text-lg lg:text-2xl font-bold text-primary">
+    Jujuy Conecta
+  </span>
+  <span className="text-[10px] lg:text-xs text-text-secondary">
+    Diario Digital
+  </span>
+</div>
+
           </Link>
 
           {/* Desktop nav */}
-          <nav className="hidden md:flex items-center gap-4">
+          <nav className="hidden lg:flex items-center gap-4">
+
             {curatedCategories.map((cat) => (
               <Link key={cat.slug} href={`/seccion/${cat.slug}`} className="text-sm font-medium text-foreground hover:text-primary">
                 {cat.nombre}

@@ -12,7 +12,7 @@ export default function DemoDiario() {
       </section>
       <section>
         <h2>Crear Noticia (borrador)</h2>
-        <NuevaNoticiaForm />
+        {/* <NuevaNoticiaForm data={data}, setData, onCreated/> */}
       </section>
       <section>
         <h2>Noticias Publicadas</h2>

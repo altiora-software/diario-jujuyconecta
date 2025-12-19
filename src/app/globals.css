@@ -172,3 +172,13 @@
 .read-the-docs {
   color: #888;
 }
+
+
+@keyframes highlight {
+  0% { background-color: hsl(var(--primary) / 0.4); }
+  100% { background-color: transparent; }
+}
+
+.animate-highlight {
+  animation: highlight 1s ease-out;
+}

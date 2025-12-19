@@ -156,6 +156,7 @@ export default function LoginPage() {
           fill
           priority
           className="object-cover"
+          sizes="100vw"
         />
         <div className="absolute inset-0 bg-gradient-to-br from-primary/90 to-primary/70 flex items-center justify-center p-16">
           <div className="text-white max-w-lg animate-scale-in">
