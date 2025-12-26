@@ -1,21 +1,22 @@
-"use client";
+"use client"
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 
-import { supabase } from "@/integrations/supabase/client";
-import NuevaNoticiaForm from "@/components/NuevaNoticiaForm";
+import { supabase } from "@/integrations/supabase/client"
+import NuevaNoticiaForm from "@/components/NuevaNoticiaForm"
+import NoticiaPreview from "@/components/NoticiaPreview"
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Badge } from "@/components/ui/badge"
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@/components/ui/card"
 import {
   Table,
   TableBody,
@@ -23,14 +24,14 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "@/components/ui/table"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@/components/ui/select"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -40,9 +41,9 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+} from "@/components/ui/alert-dialog"
 
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-toast"
 import {
   Pencil,
   Trash2,
@@ -50,119 +51,188 @@ import {
   Search,
   Loader2,
   Eye,
-} from "lucide-react";
-import { toast as sonner } from "sonner";
+} from "lucide-react"
+import { toast as sonner } from "sonner"
+
+/* -------------------- TIPOS -------------------- */
+
+type Role = "admin" | "editor" | "colaborador" | null
 
 type Noticia = {
-  id: number;
-  titulo: string;
-  estado: string;
-  fecha_publicacion: string | null;
-  slug: string;
-  owner_id: string | null; // 👈 CAMBIO: puede venir null desde Supabase
-};
+  id: number
+  titulo: string
+  estado: string
+  fecha_publicacion: string | null
+  slug: string
+  owner_id: string | null
+}
 
-type Role = "admin" | "editor" | "colaborador" | null;
+type DraftNoticia = {
+  titulo: string
+  resumen: string
+  contenido: string
+  categoriaId: string
+  imagenFile: File | null
+}
+
+/* -------------------- COMPONENTE -------------------- */
 
 export default function AdminPage() {
-  const router = useRouter();
-  const { toast } = useToast();
+  const router = useRouter()
+  const { toast } = useToast()
 
-  const [userEmail, setUserEmail] = useState<string | null>(null);
-  const [userId, setUserId] = useState<string | null>(null);
-  const [role, setRole] = useState<Role>(null);
+  /* ---------- PAGINACIÓN ---------- */
+  const PAGE_SIZE = 10
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
 
-  const [noticias, setNoticias] = useState<Noticia[]>([]);
-  const [filteredNoticias, setFilteredNoticias] = useState<Noticia[]>([]);
-  const [loading, setLoading] = useState(true);
+  /* ---------- USER ---------- */
+  const [userEmail, setUserEmail] = useState<string | null>(null)
+  const [userId, setUserId] = useState<string | null>(null)
+  const [role, setRole] = useState<Role>(null)
 
-  const [filterEstado, setFilterEstado] = useState<string>("todos");
-  const [searchTerm, setSearchTerm] = useState("");
-  const [deleteId, setDeleteId] = useState<number | null>(null);
+  /* ---------- DATA ---------- */
+  const [noticias, setNoticias] = useState<Noticia[]>([])
+  const [loading, setLoading] = useState(true)
 
-  const [promoteEmail, setPromoteEmail] = useState("");
-  const [promoteLoading, setPromoteLoading] = useState(false);
+  /* ---------- UI ---------- */
+  const [filterEstado, setFilterEstado] = useState("todos")
+  const [searchTerm, setSearchTerm] = useState("")
+  const [deleteId, setDeleteId] = useState<number | null>(null)
+  const [highlightId, setHighlightId] = useState<number | null>(null)
 
-  // ---------- Carga inicial: usuario + rol + noticias ----------
+  /* ---------- BORRADOR ---------- */
+  const [draft, setDraft] = useState<DraftNoticia>({
+    titulo: "",
+    resumen: "",
+    contenido: "",
+    categoriaId: "",
+    imagenFile: null,
+  })
+
+  /* -------------------- USER + ROLE -------------------- */
   useEffect(() => {
-    (async () => {
-      setLoading(true);
-
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+    ;(async () => {
+      const { data: { user } } = await supabase.auth.getUser()
 
       if (!user) {
-        router.replace("/login");
-        return;
+        router.replace("/login")
+        return
       }
 
-      setUserEmail(user.email ?? null);
-      setUserId(user.id ?? null);
+      setUserEmail(user.email ?? null)
+      setUserId(user.id)
 
-      // Rol del usuario
-      const { data: prof } = await supabase
+      const { data: profile } = await supabase
         .from("profiles")
         .select("role")
         .eq("id", user.id)
-        .single();
+        .single()
 
-      const r = (prof?.role ?? null) as Role;
-      setRole(r);
+      setRole((profile?.role ?? null) as Role)
+    })()
+  }, [router])
 
-      // Noticias
-      let q = supabase
-        .from("noticias")
-        .select("id,titulo,estado,fecha_publicacion,slug,owner_id")
-        .order("fecha_publicacion", { ascending: false });
+  const userReady = !!userId && !!role
 
-      // Si no es admin/editor, solo sus propias noticias
-      if (!(r === "admin" || r === "editor")) {
-        q = q.eq("owner_id", user.id);
-      }
+  /* -------------------- FETCH NOTICIAS -------------------- */
+  const fetchNoticias = async () => {
+    if (!userReady) return
 
-      const { data, error } = await q;
+    setLoading(true)
 
-      if (!error && data) {
-        const casted = data as Noticia[];
-        setNoticias(casted);
-        setFilteredNoticias(casted);
-      }
+    const from = (page - 1) * PAGE_SIZE
+    const to = from + PAGE_SIZE - 1
 
-      setLoading(false);
-    })();
-  }, [router]);
+    let query = supabase
+      .from("noticias")
+      .select(
+        "id,titulo,estado,fecha_publicacion,slug,owner_id",
+        { count: "exact" }
+      )
+      .order("created_at", { ascending: false })
+      .range(from, to)
 
-  // ---------- Filtros (estado + búsqueda) ----------
-  useEffect(() => {
-    let filtered = noticias;
+    if (!(role === "admin" || role === "editor")) {
+      query = query.eq("owner_id", userId!)
+    }
 
     if (filterEstado !== "todos") {
-      filtered = filtered.filter((n) => n.estado === filterEstado);
+      query = query.eq("estado", filterEstado)
     }
 
     if (searchTerm) {
-      const term = searchTerm.toLowerCase();
-      filtered = filtered.filter((n) =>
-        n.titulo.toLowerCase().includes(term)
-      );
+      query = query.ilike("titulo", `%${searchTerm}%`)
     }
 
-    setFilteredNoticias(filtered);
-  }, [filterEstado, searchTerm, noticias]);
+    const { data, count, error } = await query
 
-  // ---------- Acciones ----------
-  const publicar = async (id: number) => {
-    if (!(role === "admin" || role === "editor")) {
+    if (error) {
       toast({
         variant: "destructive",
-        title: "Permiso denegado",
-        description: "No tenés permiso para publicar.",
-      });
-      return;
+        title: "Error",
+        description: error.message,
+      })
+      setLoading(false)
+      return
     }
 
-    const { error, data } = await supabase
+    setNoticias((data ?? []) as Noticia[])
+    setTotalPages(Math.max(1, Math.ceil((count ?? 0) / PAGE_SIZE)))
+    setLoading(false)
+  }
+
+  useEffect(() => {
+    if (!userReady) {
+      setLoading(false)
+      return
+    }
+    fetchNoticias()
+  }, [userReady, page, filterEstado, searchTerm])
+
+  /* Reset page al filtrar */
+  useEffect(() => {
+    setPage(1)
+  }, [filterEstado, searchTerm])
+
+  /* -------------------- CREATE -------------------- */
+  const handleCreated = async (id: number) => {
+    if (page !== 1) {
+      sonner.success("Borrador creado", {
+        description: "Volvé a la página 1 para verlo",
+      })
+      return
+    }
+
+    const { data } = await supabase
+      .from("noticias")
+      .select("id,titulo,estado,fecha_publicacion,slug,owner_id")
+      .eq("id", id)
+      .single()
+
+    if (!data) return
+
+    setNoticias(prev => [data, ...prev.slice(0, PAGE_SIZE - 1)])
+    setHighlightId(data.id)
+
+    setTimeout(() => {
+      document
+        .getElementById(`noticia-${data.id}`)
+        ?.scrollIntoView({ behavior: "smooth", block: "center" })
+    }, 100)
+  }
+
+  /* -------------------- ACCIONES -------------------- */
+  const canEdit = (n: Noticia) =>
+    userId === n.owner_id || role === "admin" || role === "editor"
+
+  const canPublish = () => role === "admin" || role === "editor"
+
+  const canDelete = (n: Noticia) =>
+    userId === n.owner_id || role === "admin"
+
+  const publicar = async (id: number) => {
+    const { data, error } = await supabase
       .from("noticias")
       .update({
         estado: "publicado",
@@ -170,368 +240,248 @@ export default function AdminPage() {
       })
       .eq("id", id)
       .select("slug")
-      .single();
+      .single()
 
     if (error) {
       toast({
         variant: "destructive",
         title: "Error",
         description: error.message,
-      });
-      return;
+      })
+      return
     }
 
-    // Actualizar la lista local
-    const nowIso = new Date().toISOString();
-    setNoticias((prev) =>
-      prev.map((n) =>
+    setNoticias(prev =>
+      prev.map(n =>
         n.id === id
-          ? { ...n, estado: "publicado", fecha_publicacion: nowIso }
+          ? { ...n, estado: "publicado", fecha_publicacion: new Date().toISOString() }
           : n
       )
-    );
+    )
 
     sonner.success("Noticia publicada", {
-      description: "La noticia se publicó correctamente.",
       action: data?.slug
         ? {
             label: "Ver nota",
             onClick: () => window.open(`/nota/${data.slug}`, "_blank"),
           }
         : undefined,
-      duration: 3000,
-    });
-  };
+    })
+  }
 
   const eliminar = async (id: number) => {
-    const { error } = await supabase.from("noticias").delete().eq("id", id);
+    await supabase.from("noticias").delete().eq("id", id)
+    setNoticias(prev => prev.filter(n => n.id !== id))
+    setDeleteId(null)
+  }
 
-    if (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message,
-      });
-      return;
-    }
+  /* -------------------- UI HELPERS -------------------- */
+  const getEstadoBadge = (estado: string) =>
+    estado === "publicado"
+      ? <Badge className="bg-green-600 text-white">Publicado</Badge>
+      : <Badge variant="secondary">Borrador</Badge>
 
-    setNoticias((prev) => prev.filter((n) => n.id !== id));
-    setDeleteId(null);
+  const displayName = userEmail?.split("@")[0] ?? "Usuario"
 
-    toast({
-      title: "Noticia eliminada",
-      description: "La noticia se eliminó correctamente.",
-    });
-  };
+  /* -------------------- RENDER -------------------- */
 
-  const handleEdit = (id: number) => {
-    router.push(`/admin/editar/${id}`);
-  };
-
-  const promote = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (role !== "admin") {
-      toast({
-        variant: "destructive",
-        title: "Permiso denegado",
-        description: "Solo admin puede promover usuarios.",
-      });
-      return;
-    }
-
-    setPromoteLoading(true);
-
-    const { error } = await (supabase.rpc as any)("promote_user", {
-      p_email: promoteEmail.trim(),
-      p_role: "editor",
-    });
-
-    setPromoteLoading(false);
-
-    if (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message,
-      });
-      return;
-    }
-
-    toast({
-      title: "Usuario promovido",
-      description: `${promoteEmail} ahora es editor.`,
-    });
-    setPromoteEmail("");
-  };
-
-  const salir = async () => {
-    await supabase.auth.signOut();
-    router.push("/login");
-  };
-
-  // ---------- Helpers de permisos ----------
-  const canEdit = (noticia: Noticia) =>
-    userId === noticia.owner_id || role === "admin" || role === "editor";
-
-  const canPublish = () => role === "admin" || role === "editor";
-
-  const canDelete = (noticia: Noticia) =>
-    userId === noticia.owner_id || role === "admin";
-
-  const getEstadoBadge = (estado: string) => {
-    if (estado === "publicado") {
-      return <Badge className="bg-green-500/90 text-white">Publicado</Badge>;
-    }
-    return <Badge variant="secondary">Borrador</Badge>;
-  };
-
-  const displayName = userEmail ? userEmail.split("@")[0] : "Usuario";
-
-  // ---------- UI ----------
   return (
     <div className="min-h-screen bg-muted/30">
       <div className="container mx-auto px-4 py-8 max-w-7xl">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 pb-6 border-b border-border gap-4">
+        {/* HEADER */}
+        <div className="flex justify-between items-center mb-8 border-b pb-6">
           <div>
-            <h1 className="text-3xl sm:text-4xl font-bold mb-1">
-              👋 Hola <span className="text-primary">{displayName}</span>
+            <h1 className="text-3xl font-bold">
+              Hola <span className="text-primary">{displayName}</span>
             </h1>
-            <p className="text-muted-foreground">
-              Tu rol es{" "}
-              <span className="font-semibold capitalize">
-                {role ?? "..."}
-              </span>{" "}
-              • gestioná noticias y usuarios desde aquí
-            </p>
+            <p className="text-muted-foreground">Rol: {role ?? "..."}</p>
           </div>
-          <Button
-            onClick={salir}
-            variant="destructive"
-            className="whitespace-nowrap"
-          >
+          <Button variant="destructive" onClick={() => supabase.auth.signOut()}>
             Cerrar sesión
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-          {/* Crear nueva noticia */}
-          <Card className="xl:col-span-1 shadow-sm hover:shadow-md transition-all">
+        {/* FORM + PREVIEW */}
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-10">
+          <Card>
             <CardHeader>
               <CardTitle>Nueva Noticia</CardTitle>
-              <CardDescription>
-                Crear un borrador para revisar
-              </CardDescription>
+              <CardDescription>Redactá y previsualizá</CardDescription>
             </CardHeader>
             <CardContent>
-              <NuevaNoticiaForm />
+              <NuevaNoticiaForm
+                data={draft}
+                setData={setDraft}
+                onCreated={handleCreated}
+              />
             </CardContent>
           </Card>
 
-          {/* Listado de noticias */}
-          <Card className="xl:col-span-2 shadow-sm hover:shadow-md transition-all">
-            <CardHeader>
-              <CardTitle>Gestión de Noticias</CardTitle>
-              <CardDescription>
-                {role === "admin" || role === "editor"
-                  ? "Todas las noticias del sistema"
-                  : "Tus noticias"}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {/* Filtros */}
-              <div className="flex flex-col sm:flex-row gap-3">
-                <div className="flex-1 relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Buscar por título..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-9"
-                  />
-                </div>
-                <Select
-                  value={filterEstado}
-                  onValueChange={(value: any) => setFilterEstado(value)}
-                >
-                  <SelectTrigger className="w-full sm:w-[180px]">
-                    <SelectValue placeholder="Estado" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="todos">Todos</SelectItem>
-                    <SelectItem value="borrador">Borradores</SelectItem>
-                    <SelectItem value="publicado">Publicados</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Tabla */}
-              {loading ? (
-                <div className="flex justify-center items-center py-12">
-                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                </div>
-              ) : filteredNoticias.length === 0 ? (
-                <div className="text-center py-12 text-muted-foreground">
-                  No hay noticias para mostrar
-                </div>
-              ) : (
-                <div className="border rounded-lg overflow-hidden">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Título</TableHead>
-                        <TableHead className="w-[120px]">Estado</TableHead>
-                        <TableHead className="w-[140px] hidden md:table-cell">
-                          Fecha
-                        </TableHead>
-                        <TableHead className="w-[180px] text-right">
-                          Acciones
-                        </TableHead>
-                        <TableHead className="w-[80px]" />
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredNoticias.map((noticia) => (
-                        <TableRow key={noticia.id}>
-                          <TableCell className="font-medium">
-                            <div className="max-w-[300px] truncate">
-                              {noticia.titulo}
-                            </div>
-                          </TableCell>
-
-                          <TableCell>{getEstadoBadge(noticia.estado)}</TableCell>
-
-                          <TableCell className="hidden md:table-cell text-sm text-muted-foreground">
-                            {noticia.fecha_publicacion
-                              ? new Date(
-                                  noticia.fecha_publicacion
-                                ).toLocaleDateString("es-AR", {
-                                  day: "2-digit",
-                                  month: "2-digit",
-                                  year: "numeric",
-                                })
-                              : "--"}
-                          </TableCell>
-
-                          <TableCell className="font-medium">
-                            <div className="flex items-center justify-end gap-2">
-                              {canEdit(noticia) && (
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  onClick={() => handleEdit(noticia.id)}
-                                  title="Editar noticia"
-                                >
-                                  <Pencil className="h-4 w-4" />
-                                </Button>
-                              )}
-
-                              {noticia.estado === "borrador" &&
-                                canPublish() && (
-                                  <Button
-                                    size="sm"
-                                    onClick={() => publicar(noticia.id)}
-                                    title="Publicar"
-                                    className="bg-green-600 hover:bg-green-700"
-                                  >
-                                    <CheckCircle className="h-4 w-4" />
-                                  </Button>
-                                )}
-
-                              {canDelete(noticia) && (
-                                <Button
-                                  size="sm"
-                                  variant="destructive"
-                                  onClick={() => setDeleteId(noticia.id)}
-                                  title="Eliminar"
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              )}
-                            </div>
-                          </TableCell>
-
-                          <TableCell>
-                            <div className="flex items-center justify-end gap-2">
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() =>
-                                  window.open(
-                                    `/nota/${noticia.slug}`,
-                                    "_blank"
-                                  )
-                                }
-                                title="Ver nota pública"
-                              >
-                                <Eye className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          <div className="hidden xl:block sticky top-24">
+            <Card>
+              <CardHeader>
+                <CardTitle>Vista previa</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <NoticiaPreview data={draft} />
+              </CardContent>
+            </Card>
+          </div>
         </div>
 
-        {/* Promover usuarios (solo admin) */}
-        {role === "admin" && (
-          <Card className="mt-8 shadow-sm hover:shadow-md transition-all">
-            <CardHeader>
-              <CardTitle>Gestión de Usuarios</CardTitle>
-              <CardDescription>
-                Promover usuarios a roles superiores
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={promote} className="space-y-4">
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <div className="flex-1">
-                    <Input
-                      type="email"
-                      placeholder="usuario@ejemplo.com"
-                      value={promoteEmail}
-                      onChange={(e) => setPromoteEmail(e.target.value)}
-                      required
-                    />
-                  </div>
+        {/* LISTADO */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Gestión de Noticias</CardTitle>
+            <CardDescription>
+              {role === "admin" || role === "editor"
+                ? "Todas las noticias"
+                : "Tus noticias"}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Filtros */}
+            <div className="flex flex-col sm:flex-row gap-3">
+              <div className="flex-1 relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Buscar por título..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-9"
+                />
+              </div>
+
+              <Select value={filterEstado} onValueChange={setFilterEstado}>
+                <SelectTrigger className="w-full sm:w-[180px]">
+                  <SelectValue placeholder="Estado" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Todos</SelectItem>
+                  <SelectItem value="borrador">Borradores</SelectItem>
+                  <SelectItem value="publicado">Publicados</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Tabla */}
+            {loading ? (
+              <div className="flex justify-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              </div>
+            ) : noticias.length === 0 ? (
+              <div className="text-center py-12 text-muted-foreground">
+                No hay noticias para mostrar
+              </div>
+            ) : (
+              <>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Título</TableHead>
+                      <TableHead>Estado</TableHead>
+                      <TableHead className="hidden md:table-cell">Fecha</TableHead>
+                      <TableHead className="text-right">Acciones</TableHead>
+                      <TableHead />
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {noticias.map(n => (
+                      <TableRow
+                        key={n.id}
+                        id={`noticia-${n.id}`}
+                        className={
+                          highlightId === n.id
+                            ? "animate-highlight bg-primary/20"
+                            : ""
+                        }
+                      >
+                        <TableCell>{n.titulo}</TableCell>
+                        <TableCell>{getEstadoBadge(n.estado)}</TableCell>
+                        <TableCell className="hidden md:table-cell">
+                          {n.fecha_publicacion
+                            ? new Date(n.fecha_publicacion).toLocaleDateString("es-AR")
+                            : "--"}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex justify-end gap-2">
+                            {canEdit(n) && (
+                              <Button size="sm" variant="outline">
+                                <Pencil className="h-4 w-4" />
+                              </Button>
+                            )}
+                            {n.estado === "borrador" && canPublish() && (
+                              <Button size="sm" onClick={() => publicar(n.id)}>
+                                <CheckCircle className="h-4 w-4" />
+                              </Button>
+                            )}
+                            {canDelete(n) && (
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                onClick={() => setDeleteId(n.id)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          {n.estado === "publicado" && n.slug && (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => window.open(`/nota/${n.slug}`, "_blank")}
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+
+                {/* PAGINACIÓN */}
+                <div className="flex justify-between items-center pt-4">
                   <Button
-                    type="submit"
-                    disabled={promoteLoading}
-                    className="whitespace-nowrap"
+                    variant="outline"
+                    disabled={page === 1}
+                    onClick={() => setPage(p => p - 1)}
                   >
-                    {promoteLoading && (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    )}
-                    Promover a Editor
+                    Anterior
+                  </Button>
+                  <span className="text-sm text-muted-foreground">
+                    Página {page} de {totalPages}
+                  </span>
+                  <Button
+                    variant="outline"
+                    disabled={page === totalPages}
+                    onClick={() => setPage(p => p + 1)}
+                  >
+                    Siguiente
                   </Button>
                 </div>
-              </form>
-            </CardContent>
-          </Card>
-        )}
+              </>
+            )}
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Dialog de confirmación para eliminar */}
+      {/* DIALOG ELIMINAR */}
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>¿Eliminar noticia?</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta acción no se puede deshacer. La noticia se eliminará
-              permanentemente.
+              Esta acción no se puede deshacer.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction
+              className="bg-destructive"
               onClick={() => deleteId && eliminar(deleteId)}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               Eliminar
             </AlertDialogAction>
@@ -539,5 +489,5 @@ export default function AdminPage() {
         </AlertDialogContent>
       </AlertDialog>
     </div>
-  );
+  )
 }
