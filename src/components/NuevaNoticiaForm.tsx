@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2 } from "lucide-react";
+import { Loader2, ImagePlus, Type, Link2, AlignLeft, FileText } from "lucide-react";
 import CategorySelect from "@/components/CategorySelect";
 import { useState } from "react";
 
@@ -18,15 +18,6 @@ function toSlug(s: string) {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)+/g, "");
 }
-
-type Noticia = {
-  id: number;
-  titulo: string;
-  estado: string;
-  fecha_publicacion: string | null;
-  slug: string;
-  owner_id: string | null;
-};
 
 type DraftNoticia = {
   titulo: string;
@@ -90,8 +81,7 @@ export default function NuevaNoticiaForm({ data, setData, onCreated }: Props) {
       imagen_url = supabase.storage.from("media").getPublicUrl(path).data.publicUrl;
     }
 
-    const finalSlug =
-      slug.trim() || `${toSlug(titulo)}-${Date.now().toString(36)}`;
+    const finalSlug = slug.trim() || `${toSlug(titulo)}-${Date.now().toString(36)}`;
 
     const { data: inserted, error } = await supabase
       .from("noticias")
@@ -111,18 +101,11 @@ export default function NuevaNoticiaForm({ data, setData, onCreated }: Props) {
     setLoading(false);
 
     if (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message,
-      });
+      toast({ variant: "destructive", title: "Error", description: error.message });
       return;
     }
 
-    toast({
-      title: "Borrador creado",
-      description: "La noticia se guardó como borrador.",
-    });
+    toast({ title: "Borrador creado", description: "La noticia se guardó como borrador." });
 
     if (inserted?.id) {
       onCreated(inserted.id);
@@ -135,105 +118,118 @@ export default function NuevaNoticiaForm({ data, setData, onCreated }: Props) {
       categoriaId: "",
       imagenFile: null,
     });
-
     setSlug("");
   };
 
+  const inputStyles = "bg-white/5 border-white/10 focus:border-primary/50 text-white transition-all duration-300";
+  const labelStyles = "text-[10px] uppercase tracking-widest font-black text-slate-500 flex items-center gap-2 mb-2";
+
   return (
-
-
-
-
-
-
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Título */}
       <div className="space-y-2">
-        <Label>Título *</Label>
+        <Label className={labelStyles}>
+          <Type className="h-3 w-3" /> Título de la noticia *
+        </Label>
         <Input
           value={data.titulo}
-          onChange={(e) =>
-            setData((d) => ({ ...d, titulo: e.target.value }))
-          }
+          onChange={(e) => setData((d) => ({ ...d, titulo: e.target.value }))}
           disabled={loading}
           required
+          placeholder="Escribe un titular impactante..."
+          className={`${inputStyles} text-lg font-bold py-6 italic h-auto`}
         />
       </div>
 
-      <div className="space-y-2">
-        <Label>Slug (opcional)</Label>
-        <Input
-          value={slug}
-          onChange={(e) => setSlug(e.target.value)}
-          disabled={loading}
-          placeholder="se-genera-automaticamente"
-        />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Categoría */}
+        <div className="space-y-2">
+          <Label className={labelStyles}>
+            <FileText className="h-3 w-3" /> Categoría *
+          </Label>
+          <CategorySelect
+            value={data.categoriaId}
+            onChange={(v) => setData((d) => ({ ...d, categoriaId: v }))}
+            placeholder="Elegí una sección"
+          />
+        </div>
+
+        {/* Slug */}
+        <div className="space-y-2">
+          <Label className={labelStyles}>
+            <Link2 className="h-3 w-3" /> URL Personalizada
+          </Label>
+          <Input
+            value={slug}
+            onChange={(e) => setSlug(e.target.value)}
+            disabled={loading}
+            placeholder="slug-de-la-nota"
+            className={inputStyles}
+          />
+        </div>
       </div>
 
+      {/* Resumen */}
       <div className="space-y-2">
-        <Label>Resumen</Label>
+        <Label className={labelStyles}>
+          <AlignLeft className="h-3 w-3" /> Bajada / Resumen
+        </Label>
         <Input
           value={data.resumen}
-          onChange={(e) =>
-            setData((d) => ({ ...d, resumen: e.target.value }))
-          }
+          onChange={(e) => setData((d) => ({ ...d, resumen: e.target.value }))}
           disabled={loading}
+          placeholder="Un breve resumen para la portada..."
+          className={inputStyles}
         />
       </div>
 
+      {/* Contenido */}
       <div className="space-y-2">
-        <Label>Contenido</Label>
+        <Label className={labelStyles}>
+          <AlignLeft className="h-3 w-3" /> Cuerpo de la noticia
+        </Label>
         <Textarea
-          rows={6}
+          rows={8}
           value={data.contenido}
-          onChange={(e) =>
-            setData((d) => ({ ...d, contenido: e.target.value }))
-          }
+          onChange={(e) => setData((d) => ({ ...d, contenido: e.target.value }))}
           disabled={loading}
-          className="resize-none"
+          placeholder="Desarrolla la noticia aquí..."
+          className={`${inputStyles} resize-none leading-relaxed`}
         />
       </div>
 
+      {/* Imagen */}
       <div className="space-y-2">
-        <Label>Categoría *</Label>
-        <CategorySelect
-          value={data.categoriaId}
-          onChange={(v) =>
-            setData((d) => ({ ...d, categoriaId: v }))
-          }
-          placeholder="Elegí una categoría"
-        />
+        <Label className={labelStyles}>
+          <ImagePlus className="h-3 w-3" /> Imagen de portada
+        </Label>
+        <div className="relative group">
+          <Input
+            type="file"
+            accept="image/*"
+            onChange={(e) =>
+              setData((d) => ({
+                ...d,
+                imagenFile: e.target.files?.[0] ?? null,
+              }))
+            }
+            disabled={loading}
+            className={`${inputStyles} file:mr-4 file:py-1 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-black file:bg-primary file:text-black hover:file:bg-primary/80 cursor-pointer`}
+          />
+        </div>
       </div>
 
-      <div className="space-y-2">
-        <Label>Imagen</Label>
-        <Input
-          type="file"
-          accept="image/*"
-          onChange={(e) =>
-            setData((d) => ({
-              ...d,
-              imagenFile: e.target.files?.[0] ?? null,
-            }))
-          }
-          disabled={loading}
-        />
-      </div>
-
-      <Button type="submit" className="w-full" disabled={loading}>
-        {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-        Crear borrador
+      <Button 
+        type="submit" 
+        className="w-full bg-primary hover:bg-primary/90 text-black font-black uppercase tracking-widest py-6 h-auto transition-all shadow-lg shadow-primary/20" 
+        disabled={loading}
+      >
+        {loading ? (
+          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+        ) : (
+          "Guardar en Redacción"
+        )}
       </Button>
     </form>
   );
 }
-
-
-
-
-
-
-
-
-
-
-

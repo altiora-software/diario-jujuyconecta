@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   },
   title: {
     default:
-      "Jujuy Conecta Diario | Noticias de Jujuy, Argentina y radio en vivo",
+      "Diario Digital | Noticias de Jujuy, Argentina y radio en vivo",
     template: "%s | Jujuy Conecta Diario",
   },
   description:
