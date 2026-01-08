@@ -1,6 +1,6 @@
 'use client';
 
-import { Facebook, Instagram, Youtube, MessageCircle, Mail, MapPin, Phone } from "lucide-react";
+import { Facebook, Instagram, Youtube, MessageCircle, Mail, MapPin, Phone, ArrowUpRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -15,7 +15,7 @@ const socialLinks = [
       </svg>
     ),
     url: "https://twitter.com",
-    color: "#000000",
+    color: "#ffffff",
   },
   { name: "YouTube", icon: Youtube, url: "https://youtube.com", color: "#FF0000" },
   { name: "WhatsApp", icon: MessageCircle, url: "https://wa.me/1234567890", color: "#25D366" },
@@ -23,156 +23,123 @@ const socialLinks = [
 
 const quickLinks = [
   { name: "Inicio", path: "/" },
-  { name: "Noticias", path: "/" },
   { name: "Política", path: "/seccion/politica" },
   { name: "Economía", path: "/seccion/economia" },
   { name: "Deportes", path: "/seccion/deportes" },
-  { name: "Vivi Cosquik Rock 2026", path: "/seccion/cosquin-rock" },
+  { name: "Cosquín Rock 2026", path: "/seccion/cosquin-rock" },
 ];
 
 export default function Footer() {
   return (
-    <footer className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white mt-16">
-      <div className="container mx-auto px-4 py-12">
-        {/* Main footer content */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12">
-          {/* Logo y lema */}
-          <div className="space-y-4">
-
-<h2 className="flex items-center gap-3 text-3xl font-bold">
-  <Image src="/jc-loguito.png" alt="Logo Jujuy Conecta" width={48} height={48} className="object-contain" sizes="100vw" />
-  <span className="bg-gradient-to-r from-primary to-emerald-400 bg-clip-text text-transparent">
-    Jujuy Conecta
-  </span>
-</h2>
-   <p className="text-slate-300 text-sm leading-relaxed">
-              Información confiable desde Jujuy. Tu fuente de noticias locales y nacionales con
-              credibilidad y compromiso.
+    <footer className="relative bg-[#020817] text-white mt-20 border-t border-white/5 overflow-hidden">
+      {/* Glow decorativo de fondo */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
+      
+      <div className="container mx-auto px-6 py-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8">
+          
+          {/* Columna 1: Branding */}
+          <div className="lg:col-span-1 space-y-6">
+            <Link href="/" className="flex items-center gap-3 group">
+              <Image 
+                src="/jc-loguito.png" 
+                alt="Logo Jujuy Conecta" 
+                width={40} height={40} 
+                className="object-contain grayscale group-hover:grayscale-0 transition-all duration-500" 
+              />
+              <span className="text-2xl font-black tracking-tighter uppercase italic">
+                Jujuy<span className="text-primary">Conecta</span>
+              </span>
+            </Link>
+            <p className="text-slate-500 text-sm leading-relaxed font-medium italic">
+              "El pulso de la provincia en tiempo real. Periodismo independiente con visión de futuro."
             </p>
-            <div className="pt-2">
-              <p className="text-xs text-slate-400">
-                Periodismo independiente desde 2025
-              </p>
+            <div className="flex gap-3">
+              {socialLinks.map((social) => {
+                const Icon = social.icon;
+                return (
+                  <a
+                    key={social.name}
+                    href={social.url}
+                    target="_blank"
+                    className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center transition-all hover:border-primary/50 hover:bg-primary/10 group"
+                  >
+                    <Icon className="w-4 h-4 text-slate-400 group-hover:text-primary transition-colors" />
+                  </a>
+                );
+              })}
             </div>
           </div>
 
-          {/* Enlaces rápidos */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-white border-b border-slate-700 pb-2">
-              Enlaces Rápidos
-            </h3>
-            {/* <ul className="space-y-2">
+          {/* Columna 2: Navegación */}
+          <div className="space-y-6">
+            <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">Navegación</h3>
+            <ul className="grid grid-cols-1 gap-3">
               {quickLinks.map((link) => (
-                <li key={link.path}>
+                <li key={link.name}>
                   <Link
-                   href={link.path}
-                    className="text-slate-300 hover:text-primary transition-colors duration-300 text-sm inline-flex items-center group"
+                    href={link.path}
+                    className="text-slate-400 hover:text-white transition-colors text-sm font-bold flex items-center gap-2 group"
                   >
-                    <span className="w-0 group-hover:w-2 h-0.5 bg-primary transition-all duration-300 mr-0 group-hover:mr-2"></span>
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-            </ul> */}
-            <ul className="space-y-2">
-              {quickLinks.map((link, i) => (
-                <li key={`${link.path}-${link.name}-${i}`}>
-                  <Link
-                  href={link.path}
-                    className="text-slate-300 hover:text-primary transition-colors duration-300 text-sm inline-flex items-center group"
-                  >
-                    <span className="w-0 group-hover:w-2 h-0.5 bg-primary transition-all duration-300 mr-0 group-hover:mr-2"></span>
+                    <span className="w-1 h-1 rounded-full bg-primary opacity-0 group-hover:opacity-100 transition-opacity" />
                     {link.name}
                   </Link>
                 </li>
               ))}
             </ul>
-
           </div>
 
-          {/* Contacto y redes */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-white border-b border-slate-700 pb-2">
-              Contacto
-            </h3>
-            <div className="space-y-3">
-              <a
-                href="mailto:jujuyconecta@gmail.com"
-                className="flex items-center gap-3 text-slate-300 hover:text-primary transition-colors duration-300 text-sm group"
-              >
-                <Mail className="w-5 h-5 flex-shrink-0 group-hover:scale-110 transition-transform duration-300" />
-                <span>jujuyconecta@gmail.com</span>
+          {/* Columna 3: Contacto Técnico */}
+          <div className="space-y-6">
+            <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">Redacción</h3>
+            <div className="space-y-4">
+              <a href="mailto:jujuyconecta@gmail.com" className="block group">
+                <span className="text-[10px] text-slate-600 block uppercase mb-1">Email</span>
+                <span className="text-sm font-bold text-slate-300 group-hover:text-primary transition-colors">jujuyconecta@gmail.com</span>
               </a>
-              <a
-                href="tel:+543884000000"
-                className="flex items-center gap-3 text-slate-300 hover:text-primary transition-colors duration-300 text-sm group"
-              >
-                <Phone className="w-5 h-5 flex-shrink-0 group-hover:scale-110 transition-transform duration-300" />
-                <span>+54 388 400-0000</span>
-              </a>
-              <div className="flex items-start gap-3 text-slate-300 text-sm">
-                <MapPin className="w-5 h-5 flex-shrink-0 mt-0.5" />
-                <span>San Salvador de Jujuy, Argentina</span>
-              </div>
-            </div>
-
-            {/* Redes sociales */}
-            <div className="pt-4">
-              <h4 className="text-sm font-medium text-slate-400 mb-3">Seguinos en:</h4>
-              <div className="flex gap-3">
-                {socialLinks.map((social) => {
-                  const Icon = social.icon;
-                  return (
-                    <a
-                      key={social.name}
-                      href={social.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-10 h-10 rounded-full bg-slate-800 hover:bg-slate-700 border border-slate-700 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:shadow-lg group"
-                      style={{
-                        ["--hover-color" as any]: social.color,
-                      }}
-                      aria-label={social.name}
-                    >
-                      <Icon className="w-5 h-5 text-slate-300 group-hover:text-white transition-colors duration-300" />
-                    </a>
-                  );
-                })}
+              <div className="block">
+                <span className="text-[10px] text-slate-600 block uppercase mb-1">Ubicación</span>
+                <span className="text-sm font-bold text-slate-300">San Salvador de Jujuy, Argentina</span>
               </div>
             </div>
           </div>
+
+          {/* Columna 4: Newsletter o Acción */}
+          <div className="space-y-6">
+            <div className="p-6 rounded-[2rem] bg-white/[0.02] border border-white/5 relative overflow-hidden group">
+              <div className="absolute -right-4 -top-4 w-20 h-20 bg-primary/10 rounded-full blur-2xl group-hover:bg-primary/20 transition-colors" />
+              <h4 className="text-sm font-black uppercase tracking-widest mb-2 italic">Sumá tu negocio</h4>
+              <p className="text-xs text-slate-500 mb-4 font-medium">Aparecé en nuestro Marketplace y conectá con miles de lectores.</p>
+              <Link 
+                href="/servicios/marketplace" 
+                className="flex items-center gap-2 text-[10px] font-black uppercase tracking-tighter text-primary hover:gap-3 transition-all"
+              >
+                SABER MÁS <ArrowUpRight className="w-3 h-3" />
+              </Link>
+            </div>
+          </div>
+
         </div>
 
-        {/* Bottom bar */}
-        <div className="mt-12 pt-8 border-t border-slate-800">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-slate-400 text-sm text-center md:text-left">
-              © 2025 Jujuy Conecta – Todos los derechos reservados
+        {/* Footer Bottom */}
+        <div className="mt-20 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="flex items-center gap-6">
+            <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">
+              © 2026 JUJUY CONECTA
             </p>
-            <div className="flex gap-6 text-sm">
-              <Link
-                href="/privacidad"
-                className="text-slate-400 hover:text-primary transition-colors duration-300"
-              >
-                Privacidad
-              </Link>
-              <Link
-                href="/terminos"
-                className="text-slate-400 hover:text-primary transition-colors duration-300"
-              >
-                Términos
-              </Link>
-              <Link
-
-                href="/login"
-                className="text-slate-500 hover:text-primary transition-colors duration-300"
-                rel="nofollow"
-              >
-                Acceso redacción
-              </Link>
+            <span className="hidden md:block w-px h-4 bg-white/10" />
+            <div className="flex gap-4">
+              <Link href="/privacidad" className="text-[10px] font-bold text-slate-600 hover:text-white uppercase tracking-widest transition-colors">Privacidad</Link>
+              <Link href="/terminos" className="text-[10px] font-bold text-slate-600 hover:text-white uppercase tracking-widest transition-colors">Términos</Link>
             </div>
-
           </div>
+          
+          <Link 
+            href="/login" 
+            className="px-4 py-2 rounded-lg border border-white/5 text-[9px] font-black uppercase tracking-[0.2em] text-slate-600 hover:text-primary hover:border-primary/20 transition-all"
+          >
+            Acceso Redacción
+          </Link>
         </div>
       </div>
     </footer>

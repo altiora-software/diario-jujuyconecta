@@ -2,13 +2,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import SocialSidebar from "@/components/SocialSidebar";
-import { Card, CardContent } from "@/components/ui/card";
 import RecentNewsList from "@/components/RecentNewsList";
+import { ChevronLeft, Globe, Zap, AlertCircle } from "lucide-react";
 
-// Helpers para Supabase (ya definidos en newsQueries.ts)
+// Helpers para Supabase
 import { getCategoryBySlug, getNoticiasByCategoriaId } from "@/lib/newsQueries";
 
-// Ajuste de claves según tu .env
 const SUPABASE_ANON_KEY =
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ??
   process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ??
@@ -44,7 +43,6 @@ type NoticiaInternal = {
   created_at?: string | null;
 };
 
-// slugify igual que en tu implementación previa
 const slugifyTitle = (s: string) =>
   s
     .toLowerCase()
@@ -64,55 +62,34 @@ const slugToCategoryMap: Record<string, string> = {
   economia: "business",
 };
 
-// Revalidar cada 5 minutos
 export const revalidate = 300;
 
-// Ojo, params como Promise porque ya lo venías usando así
 type PageProps = {
   params: Promise<{ slug: string }>;
 };
 
-// generateMetadata con lookup real a la categoría
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-
   try {
     const catRes = await getCategoryBySlug(slug);
     const nombre = catRes?.data?.nombre ?? slug;
-    const nombreSeccion =
-      String(nombre).charAt(0).toUpperCase() + String(nombre).slice(1);
-
+    const nombreSeccion = String(nombre).charAt(0).toUpperCase() + String(nombre).slice(1);
     return {
-      title: `Noticias de ${nombreSeccion} | Jujuy Conecta Diario`,
+      title: `${nombreSeccion} | Jujuy Conecta Diario`,
       description: `Todas las noticias sobre ${nombreSeccion} actualizadas en Jujuy Conecta Diario.`,
     };
   } catch {
-    const nombreSeccion =
-      slug.charAt(0).toUpperCase() + slug.slice(1).toLowerCase();
+    const nombreSeccion = slug.charAt(0).toUpperCase() + slug.slice(1).toLowerCase();
     return {
-      title: `Noticias de ${nombreSeccion} | Jujuy Conecta Diario`,
-      description: `Todas las noticias sobre ${nombreSeccion} actualizadas en Jujuy Conecta Diario.`,
+      title: `${nombreSeccion} | Jujuy Conecta Diario`,
     };
   }
 }
 
-/**
- * Fallback externo vía proxy de noticias
- * Mantiene el mapeo category -> top-headlines, con fallback a everything
- */
-async function fetchNoticiasPorProxy(
-  slug: string
-): Promise<{ noticias: NoticiaExternal[]; error: string | null }> {
-  if (!NEWS_PROXY_URL) {
-    return {
-      noticias: [],
-      error: "Falta configurar NEWS_PROXY_URL en el entorno",
-    };
-  }
-
+async function fetchNoticiasPorProxy(slug: string): Promise<{ noticias: NoticiaExternal[]; error: string | null }> {
+  if (!NEWS_PROXY_URL) return { noticias: [], error: "Falta configurar NEWS_PROXY_URL" };
   const normalized = slug.toLowerCase();
   const mappedCategory = slugToCategoryMap[normalized];
-
   let articles: any[] = [];
 
   try {
@@ -122,24 +99,13 @@ async function fetchNoticiasPorProxy(
       p1.set("pageSize", "24");
       p1.set("category", mappedCategory);
       p1.set("country", "ar");
-
       const urlTop = `${NEWS_PROXY_URL}/top-headlines?${p1.toString()}`;
-      const resTop = await fetch(urlTop, {
-        headers: FUNCTION_HEADERS,
-        next: { revalidate: 300 },
-      });
+      const resTop = await fetch(urlTop, { headers: FUNCTION_HEADERS, next: { revalidate: 300 } });
       const jsonTop = await resTop.json();
-
-      if (
-        resTop.ok &&
-        jsonTop?.status === "ok" &&
-        (jsonTop.articles?.length ?? 0) > 0
-      ) {
+      if (resTop.ok && jsonTop?.status === "ok" && (jsonTop.articles?.length ?? 0) > 0) {
         articles = jsonTop.articles;
       }
     }
-
-    // Si no hubo artículos por categoría, fallback a everything con la keyword
     if (articles.length === 0) {
       const q = normalized || "noticias";
       const p2 = new URLSearchParams();
@@ -147,28 +113,16 @@ async function fetchNoticiasPorProxy(
       p2.set("language", "es");
       p2.set("sortBy", "publishedAt");
       p2.set("pageSize", "24");
-
       const urlEv = `${NEWS_PROXY_URL}/everything?${p2.toString()}`;
-      const resEv = await fetch(urlEv, {
-        headers: FUNCTION_HEADERS,
-        next: { revalidate: 300 },
-      });
+      const resEv = await fetch(urlEv, { headers: FUNCTION_HEADERS, next: { revalidate: 300 } });
       const jsonEv = await resEv.json();
-
-      if (!resEv.ok || jsonEv?.status !== "ok") {
-        throw new Error(jsonEv?.message || `HTTP ${resEv.status}`);
-      }
-
+      if (!resEv.ok || jsonEv?.status !== "ok") throw new Error(jsonEv?.message || `HTTP ${resEv.status}`);
       articles = jsonEv.articles || [];
     }
-
     const mapped: NoticiaExternal[] = articles.map((a: any, i: number) => {
       const title = a.title || a.description || "Sin título";
       const publishedAt = a.publishedAt ?? null;
-      const slugFromTitle =
-        slugifyTitle(title) +
-        (publishedAt ? "-" + new Date(publishedAt).getTime() : `-${i}`);
-
+      const slugFromTitle = slugifyTitle(title) + (publishedAt ? "-" + new Date(publishedAt).getTime() : `-${i}`);
       return {
         id: a.url ?? `${i}-${publishedAt ?? Date.now()}`,
         titulo: title,
@@ -179,45 +133,20 @@ async function fetchNoticiasPorProxy(
         original_url: a.url ?? null,
       };
     });
-
     return { noticias: mapped, error: null };
   } catch (e: any) {
-    return {
-      noticias: [],
-      error: e?.message ?? "Error inesperado al cargar noticias",
-    };
+    return { noticias: [], error: e?.message };
   }
 }
 
-/**
- * Noticias internas, usando helpers centralizados
- */
-async function fetchNoticiasInternas(
-  slug: string
-): Promise<{ noticias: NoticiaInternal[]; error: string | null }> {
+async function fetchNoticiasInternas(slug: string): Promise<{ noticias: NoticiaInternal[]; error: string | null }> {
   try {
     const catRes = await getCategoryBySlug(slug);
-    if (catRes.error) {
-      return {
-        noticias: [],
-        error: String(catRes.error.message ?? catRes.error),
-      };
-    }
-
-    if (!catRes.data) {
-      return { noticias: [], error: null };
-    }
-
+    if (catRes.error) return { noticias: [], error: String(catRes.error.message ?? catRes.error) };
+    if (!catRes.data) return { noticias: [], error: null };
     const noticiasRes = await getNoticiasByCategoriaId(catRes.data.id, 24);
-    if (noticiasRes.error) {
-      return {
-        noticias: [],
-        error: String(noticiasRes.error.message ?? noticiasRes.error),
-      };
-    }
-
+    if (noticiasRes.error) return { noticias: [], error: String(noticiasRes.error.message ?? noticiasRes.error) };
     const rows = (noticiasRes.data ?? []) as any[];
-
     const mapped: NoticiaInternal[] = rows.map((r) => ({
       id: r.id,
       titulo: r.titulo,
@@ -226,267 +155,120 @@ async function fetchNoticiasInternas(
       fecha_publicacion: r.fecha_publicacion ?? r.created_at ?? null,
       created_at: r.created_at ?? null,
     }));
-
     return { noticias: mapped, error: null };
   } catch (e: any) {
-    return {
-      noticias: [],
-      error: e?.message ?? "Error al leer noticias internas",
-    };
+    return { noticias: [], error: e?.message };
   }
 }
 
-/**
- * Página de sección
- * 1. Intenta internas
- * 2. Si hay error, muestra error y prueba proxy
- * 3. Si no hay internas pero tampoco error, usa proxy como fallback
+/** * COMPONENTE DE TARJETA (Visual Only)
  */
-export default async function SeccionPage({ params }: PageProps) {
-  const { slug } = await params;
-
-  const internas = await fetchNoticiasInternas(slug);
-
-  // Caso con error interno: mostramos error y probamos proxy igual
-  if (internas.error) {
-    const proxy = await fetchNoticiasPorProxy(slug);
-
-    return (
-      <div className="min-h-screen bg-background">
-        <SocialSidebar />
-        <main className="container mx-auto px-4 py-8">
-          <div className="bg-destructive/10 border border-destructive text-destructive px-4 py-3 rounded mb-6">
-            Error al cargar noticias internas: {internas.error}
-          </div>
-
-          {proxy.error && (
-            <div className="bg-destructive/10 border border-destructive text-destructive px-4 py-3 rounded mb-6">
-              Error también al cargar el proveedor externo: {proxy.error}
-            </div>
-          )}
-
-          {proxy.noticias.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-text-muted text-lg">
-                No hay noticias disponibles en esta sección.
-              </p>
-              <Link
-                href="/"
-                className="text-primary hover:underline mt-4 inline-block"
-              >
-                Volver al inicio
-              </Link>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {proxy.noticias.map((noticia) => {
-                const card = (
-                  <Card className="overflow-hidden card-hover border h-full">
-                    <CardContent className="p-0 flex flex-col h-full">
-                      <div className="relative overflow-hidden h-48">
-                        <img
-                          src={noticia.imagen_url || "/placeholder.svg"}
-                          alt={noticia.titulo}
-                          className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-                        />
-                      </div>
-                      <div className="p-4 flex flex-col flex-grow">
-                        <h3 className="text-lg font-semibold text-foreground mb-2 line-clamp-2">
-                          {noticia.titulo}
-                        </h3>
-                        {noticia.source && (
-                          <p className="text-sm text-muted-foreground mb-2">
-                            {noticia.source}
-                          </p>
-                        )}
-                        <time className="text-xs text-muted-foreground mt-auto">
-                          {noticia.fecha_publicacion
-                            ? new Date(
-                                noticia.fecha_publicacion
-                              ).toLocaleDateString("es-AR")
-                            : "Fecha no disponible"}
-                        </time>
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-
-                if (noticia.original_url) {
-                  return (
-                    <a
-                      key={noticia.id}
-                      href={noticia.original_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {card}
-                    </a>
-                  );
-                }
-
-                return (
-                  <Link key={noticia.id} href={`/nota/${noticia.slug}`}>
-                    {card}
-                  </Link>
-                );
-              })}
-            </div>
-          )}
-        </main>
-      </div>
-    );
-  }
-
-  // Hay internas, sin error
-  if ((internas.noticias ?? []).length > 0) {
-    const noticias = internas.noticias as NoticiaInternal[];
-
-    return (
-      <div className="min-h-screen bg-background">
-        <SocialSidebar />
-
-        <main className="container mx-auto px-4 py-8">
-          <h1 className="text-4xl font-bold text-headline-primary mb-2 capitalize">
-            {slug}
-          </h1>
-          <p className="text-text-muted mb-8">
-            Noticias locales de la sección {slug}
-          </p>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {noticias.map((noticia) => {
-              const card = (
-                <Card className="overflow-hidden card-hover border h-full">
-                  <CardContent className="p-0 flex flex-col h-full">
-                    <div className="relative overflow-hidden h-48">
-                      <img
-                        src={noticia.imagen_url || "/placeholder.svg"}
-                        alt={noticia.titulo}
-                        className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-                      />
-                    </div>
-                    <div className="p-4 flex flex-col flex-grow">
-                      <h3 className="text-lg font-semibold text-foreground mb-2 line-clamp-2">
-                        {noticia.titulo}
-                      </h3>
-                      <time className="text-xs text-muted-foreground mt-auto">
-                        {noticia.fecha_publicacion
-                          ? new Date(
-                              noticia.fecha_publicacion
-                            ).toLocaleDateString("es-AR")
-                          : "Fecha no disponible"}
-                      </time>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-
-              return (
-                <Link key={noticia.id} href={`/nota/${noticia.slug}`}>
-                  {card}
-                </Link>
-              );
-            })}
-          </div>
-
-          <div className="mt-8">
-            <RecentNewsList categorySlug={slug} />
-          </div>
-        </main>
-      </div>
-    );
-  }
-
-  // No hay internas ni error, usamos proxy
-  const proxy = await fetchNoticiasPorProxy(slug);
+const NewsCard = ({ noticia, isExternal }: { noticia: any, isExternal: boolean }) => {
+  const url = isExternal ? noticia.original_url : `/nota/${noticia.slug}`;
+  const target = isExternal ? "_blank" : "_self";
 
   return (
-    <div className="min-h-screen bg-background">
+    <Link href={url} target={target} className="group flex flex-col h-full">
+      <div className="relative w-full h-52 rounded-[2rem] overflow-hidden mb-4 border border-white/10 shadow-lg group-hover:border-primary/40 transition-all duration-500">
+        <img 
+          src={noticia.imagen_url || "/placeholder.svg"} 
+          alt={noticia.titulo} 
+          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#020817] via-transparent to-transparent opacity-70" />
+        <div className="absolute top-4 right-4">
+          <span className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter backdrop-blur-md border border-white/10 ${isExternal ? 'bg-blue-500/20 text-blue-400' : 'bg-primary/20 text-primary'}`}>
+            {isExternal ? <Globe className="w-3 h-3" /> : <Zap className="w-3 h-3" />}
+            {isExternal ? (noticia.source || 'Global') : 'Exclusivo'}
+          </span>
+        </div>
+      </div>
+      <div className="px-2">
+        <h3 className="text-lg font-bold text-slate-100 group-hover:text-primary transition-colors line-clamp-2 leading-tight mb-2">
+          {noticia.titulo}
+        </h3>
+        <time className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+          {new Date(noticia.fecha_publicacion || noticia.created_at || "").toLocaleDateString("es-AR", { day: 'numeric', month: 'long' })}
+        </time>
+      </div>
+    </Link>
+  );
+};
+
+export default async function SeccionPage({ params }: PageProps) {
+  const { slug } = await params;
+  
+  // 1. Intentar internas
+  const internas = await fetchNoticiasInternas(slug);
+  
+  let noticiasAMostrar = internas.noticias || [];
+  let isExternalFallback = false;
+  let errorMsg = internas.error;
+
+  // 2. Si no hay internas o hubo error, intentar proxy
+  if (noticiasAMostrar.length === 0) {
+    const proxy = await fetchNoticiasPorProxy(slug);
+    noticiasAMostrar = proxy.noticias;
+    isExternalFallback = true;
+    if (proxy.error) errorMsg = proxy.error;
+  }
+
+  return (
+    <div className="min-h-screen bg-[#020817] text-white">
       <SocialSidebar />
+      <main className="container mx-auto px-4 py-12">
+        <header className="mb-12">
+          <Link href="/" className="inline-flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-widest mb-6 hover:opacity-70 transition-opacity">
+            <ChevronLeft className="w-4 h-4" /> Inicio
+          </Link>
+          <div className="flex items-center gap-4">
+            <span className="w-2 h-12 bg-primary rounded-full shadow-[0_0_15px_rgba(16,185,129,0.5)]" />
+            <div>
+              <h1 className="text-5xl md:text-6xl font-black uppercase tracking-tighter italic">
+                {slug}
+              </h1>
+              <p className="text-slate-400 font-medium mt-1">
+                {isExternalFallback ? 'Cobertura Global en Tiempo Real' : 'Noticias Locales Actualizadas'}
+              </p>
+            </div>
+          </div>
+        </header>
 
-      <main className="container mx-auto px-4 py-8">
-        <h1 className="text-4xl font-bold text-headline-primary mb-2 capitalize">
-          {slug}
-        </h1>
-        <p className="text-text-muted mb-8">
-          Todas las noticias sobre {slug}
-        </p>
-
-        {proxy.error && (
-          <div className="bg-destructive/10 border border-destructive text-destructive px-4 py-3 rounded mb-6">
-            {proxy.error}
+        {errorMsg && (
+          <div className="flex items-center gap-3 p-4 mb-8 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm italic">
+            <AlertCircle className="w-5 h-5" />
+            <p>Aviso del sistema: {errorMsg}. Explorando fuentes alternativas...</p>
           </div>
         )}
 
-        {!proxy.error && proxy.noticias.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-text-muted text-lg">
-              No hay noticias disponibles en esta sección.
-            </p>
-            <Link
-              href="/"
-              className="text-primary hover:underline mt-4 inline-block"
-            >
-              Volver al inicio
-            </Link>
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-12">
+          <div className="xl:col-span-8">
+            {noticiasAMostrar.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                {noticiasAMostrar.map((n: any) => (
+                  <NewsCard key={n.id} noticia={n} isExternal={isExternalFallback} />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-20 border border-dashed border-white/10 rounded-[3rem]">
+                <p className="text-slate-500 text-lg italic">No se encontraron noticias disponibles en este momento.</p>
+                <Link href="/" className="text-primary font-bold mt-4 inline-block hover:underline">Volver al Home</Link>
+              </div>
+            )}
           </div>
-        )}
 
-        {!proxy.error && proxy.noticias.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {proxy.noticias.map((noticia) => {
-              const card = (
-                <Card className="overflow-hidden card-hover border h-full">
-                  <CardContent className="p-0 flex flex-col h-full">
-                    <div className="relative overflow-hidden h-48">
-                      <img
-                        src={noticia.imagen_url || "/placeholder.svg"}
-                        alt={noticia.titulo}
-                        className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-                      />
-                    </div>
-                    <div className="p-4 flex flex-col flex-grow">
-                      <h3 className="text-lg font-semibold text-foreground mb-2 line-clamp-2">
-                        {noticia.titulo}
-                      </h3>
-                      {noticia.source && (
-                        <p className="text-sm text-muted-foreground mb-2">
-                          {noticia.source}
-                        </p>
-                      )}
-                      <time className="text-xs text-muted-foreground mt-auto">
-                        {noticia.fecha_publicacion
-                          ? new Date(
-                              noticia.fecha_publicacion
-                            ).toLocaleDateString("es-AR")
-                          : "Fecha no disponible"}
-                      </time>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-
-              if (noticia.original_url) {
-                return (
-                  <a
-                    key={noticia.id}
-                    href={noticia.original_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {card}
-                  </a>
-                );
-              }
-
-              return (
-                <Link key={noticia.id} href={`/nota/${noticia.slug}`}>
-                  {card}
-                </Link>
-              );
-            })}
-          </div>
-        )}
+          <aside className="xl:col-span-4 space-y-10">
+            <div className="sticky top-28">
+              <div className="p-8 rounded-[2.5rem] bg-white/[0.02] border border-white/10 backdrop-blur-sm">
+                <h2 className="text-xl font-black uppercase tracking-tighter mb-6 flex items-center gap-2 italic">
+                  <span className="w-2 h-2 bg-primary rounded-full animate-pulse" />
+                  Lo más reciente
+                </h2>
+                <RecentNewsList categorySlug={slug} />
+              </div>
+            </div>
+          </aside>
+        </div>
       </main>
     </div>
   );

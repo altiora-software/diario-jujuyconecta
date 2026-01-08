@@ -1,14 +1,12 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
-import { Search, Menu, X, ChevronDown } from "lucide-react";
+import { Search, Menu, X, ChevronDown, Rocket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 
 type Categoria = { id: number; nombre: string; slug: string };
-
-// Lista curada que se muestra siempre en el header principal
 const CURATED = ["provinciales", "actualidad", "deportes", "cultura", "economia"];
 
 export default function Header() {
@@ -16,7 +14,7 @@ export default function Header() {
   const [cats, setCats] = useState<Categoria[]>([]);
   const [loadingCats, setLoadingCats] = useState(true);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [mobileShowAll, setMobileShowAll] = useState(false); // <-- nuevo: controla "ver todas" en mobile
+  const [mobileShowAll, setMobileShowAll] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -54,27 +52,34 @@ export default function Header() {
   const otherCategories = cats.filter((c) => !CURATED.includes(c.slug));
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-news-border bg-background/95 backdrop-blur">
+    <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-[#020817]/80 backdrop-blur-xl">
       <div className="container mx-auto px-4">
-        <div className="flex h-16 items-center justify-between">
-          <Link href="/" className="flex items-center space-x-3">
-            <img src="/jc-navidad.png" alt="Jujuy Conecta" className="h-12 w-12" />
-            <div className="flex flex-col leading-tight">
-  <span className="text-lg lg:text-2xl font-bold text-primary">
-    Jujuy Conecta
-  </span>
-  <span className="text-[10px] lg:text-xs text-text-secondary">
-    Diario Digital
-  </span>
-</div>
-
+        <div className="flex h-20 items-center justify-between">
+          
+          {/* Logo y Branding */}
+          <Link href="/" className="flex items-center space-x-3 group">
+            <div className="relative">
+               <img src="/jc.png" alt="Jujuy Conecta" className="h-12 w-12 transition-transform group-hover:scale-110 duration-300" />
+               <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full -z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
+            </div>
+            <div className="flex flex-col leading-none">
+              <span className="text-xl lg:text-2xl font-black tracking-tighter text-white">
+                JUJUY<span className="text-primary">CONECTA</span>
+              </span>
+              <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-slate-400">
+                Diario Digital
+              </span>
+            </div>
           </Link>
 
           {/* Desktop nav */}
-          <nav className="hidden lg:flex items-center gap-4">
-
+          <nav className="hidden lg:flex items-center gap-6">
             {curatedCategories.map((cat) => (
-              <Link key={cat.slug} href={`/seccion/${cat.slug}`} className="text-sm font-medium text-foreground hover:text-primary">
+              <Link 
+                key={cat.slug} 
+                href={`/seccion/${cat.slug}`} 
+                className="text-sm font-bold uppercase tracking-wider text-slate-300 hover:text-primary transition-colors"
+              >
                 {cat.nombre}
               </Link>
             ))}
@@ -82,98 +87,94 @@ export default function Header() {
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setDropdownOpen((v) => !v)}
-                className="text-sm font-medium inline-flex items-center gap-1 px-2 py-1 rounded hover:bg-muted"
-                aria-haspopup="menu"
-                aria-expanded={dropdownOpen}
+                className="text-sm font-bold uppercase tracking-wider inline-flex items-center gap-1 px-3 py-2 rounded-full bg-white/5 border border-white/10 text-slate-300 hover:bg-white/10 transition-all"
               >
-                Categorías <ChevronDown className="h-4 w-4" />
+                Más <ChevronDown className={`h-4 w-4 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
               </button>
 
               {dropdownOpen && (
-                <div className="absolute left-0 mt-2 w-56 bg-background border rounded shadow-lg p-2 z-50">
+                <div className="absolute left-0 mt-3 w-64 bg-[#0a0f1d] border border-white/10 rounded-2xl shadow-2xl p-3 z-50 animate-in fade-in zoom-in duration-200">
                   {loadingCats ? (
-                    <div className="p-2 text-sm text-muted-foreground">Cargando...</div>
+                    <div className="p-2 text-sm text-slate-500 animate-pulse">Cargando secciones...</div>
                   ) : (
-                    <>
+                    <div className="grid grid-cols-1 gap-1">
                       {otherCategories.map((c) => (
                         <Link
                           key={c.slug}
                           href={`/seccion/${c.slug}`}
-                          className="block px-3 py-2 rounded hover:bg-muted text-sm"
+                          className="block px-4 py-2.5 rounded-xl hover:bg-primary/10 hover:text-primary text-sm font-medium text-slate-300 transition-all"
                           onClick={() => setDropdownOpen(false)}
                         >
                           {c.nombre}
                         </Link>
                       ))}
-                    </>
+                    </div>
                   )}
                 </div>
               )}
             </div>
           </nav>
 
-          {/* Right: search + CTA + mobile menu */}
-          <div className="flex items-center space-x-2">
-            <Button asChild size="sm" className="hidden md:inline-flex shadow-sm">
-              <a href="https://jujuyconecta.com" target="_blank" rel="noopener noreferrer">🚀 Plataforma</a>
-            </Button>
-
-            <form action="/buscar" method="GET" className="relative hidden sm:block">
-              <Search className="absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input type="search" name="q" placeholder="Buscar noticias..." className="pl-8 w-48 lg:w-64" />
+          {/* Right: search + CTA */}
+          <div className="flex items-center space-x-3">
+            <form action="/buscar" method="GET" className="relative hidden xl:block">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+              <Input 
+                type="search" 
+                name="q" 
+                placeholder="Buscar noticia..." 
+                className="pl-10 w-48 bg-white/5 border-white/10 focus:border-primary/50 rounded-full text-white placeholder:text-slate-600" 
+              />
             </form>
 
-            <Button variant="ghost" size="icon" className="md:hidden" onClick={() => { setMenuOpen((v) => !v); setMobileShowAll(false); }} aria-label="Abrir menú">
-              {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            <Button asChild size="sm" className="hidden md:flex bg-primary hover:bg-primary/90 text-black font-bold rounded-full px-5">
+              <a href="https://jujuyconecta.com" target="_blank" rel="noopener noreferrer">
+                <Rocket className="mr-2 h-4 w-4" /> PLATAFORMA
+              </a>
+            </Button>
+
+            <Button variant="ghost" size="icon" className="lg:hidden text-white" onClick={() => { setMenuOpen((v) => !v); setMobileShowAll(false); }}>
+              {menuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </Button>
           </div>
         </div>
 
-        {/* Mobile expanded menu: ahora muestra curated + botón para ver todas */}
+        {/* Mobile menu */}
         {menuOpen && (
-          <div className="md:hidden bg-background border-t border-border shadow-lg rounded-b-xl">
-            <nav className="flex flex-col py-2">
-              {/* Mostrar solo las categorías curadas primero (evita lista gigante) */}
+          <div className="lg:hidden bg-[#020817] border-t border-white/10 pb-8 animate-in slide-in-from-top duration-300">
+            <nav className="flex flex-col p-4 gap-2">
               {curatedCategories.map((c) => (
-                <Link key={c.slug} href={`/seccion/${c.slug}`} className="px-4 py-2 text-sm font-medium hover:bg-muted" onClick={() => setMenuOpen(false)}>
+                <Link key={c.slug} href={`/seccion/${c.slug}`} className="px-4 py-4 text-lg font-bold text-slate-200 border-b border-white/5" onClick={() => setMenuOpen(false)}>
                   {c.nombre}
                 </Link>
               ))}
-
-              {/* Botón para expandir y ver todas las categorías */}
+              
               <button
-                className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-muted font-medium"
+                className="flex items-center justify-between px-4 py-4 text-lg font-bold text-primary"
                 onClick={() => setMobileShowAll((v) => !v)}
-                aria-expanded={mobileShowAll}
-                aria-controls="mobile-all-categories"
               >
-                {mobileShowAll ? "Ocultar categorías" : "Ver todas las categorías"}
-                <ChevronDown className={`h-4 w-4 transition-transform ${mobileShowAll ? "rotate-180" : ""}`} />
+                TODAS LAS SECCIONES
+                <ChevronDown className={`h-5 w-5 transition-transform ${mobileShowAll ? "rotate-180" : ""}`} />
               </button>
 
-              {/* Lista completa (colapsable) */}
               {mobileShowAll && (
-                <div id="mobile-all-categories" className="border-t border-border mt-2">
-                  {loadingCats ? (
-                    <div className="px-4 py-2 text-sm text-muted-foreground">Cargando...</div>
-                  ) : (
-                    cats.map((c) => (
-                      <Link
-                        key={c.slug}
-                        href={`/seccion/${c.slug}`}
-                        className="block px-4 py-2 text-sm hover:bg-muted"
-                        onClick={() => { setMenuOpen(false); setMobileShowAll(false); }}
-                      >
-                        {c.nombre}
-                      </Link>
-                    ))
-                  )}
+                <div className="grid grid-cols-2 gap-2 p-2 bg-white/5 rounded-2xl">
+                  {cats.map((c) => (
+                    <Link
+                      key={c.slug}
+                      href={`/seccion/${c.slug}`}
+                      className="px-4 py-3 text-sm font-medium text-slate-400 hover:text-white"
+                      onClick={() => { setMenuOpen(false); }}
+                    >
+                      {c.nombre}
+                    </Link>
+                  ))}
                 </div>
               )}
 
-              <div className="px-4 py-3">
-                <Button asChild size="sm" className="w-full">
-                  <a href="https://jujuyconecta.com" target="_blank" rel="noopener noreferrer">🚀 Plataforma</a>
+              <div className="mt-6">
+                <Button asChild className="w-full bg-primary text-black font-bold py-6 rounded-2xl">
+                  <a href="https://jujuyconecta.com">ACCEDER A PLATAFORMA</a>
                 </Button>
               </div>
             </nav>

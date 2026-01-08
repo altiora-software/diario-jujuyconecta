@@ -10,6 +10,8 @@ import RecentNewsList from "@/components/RecentNewsList";
 import ShareButtons from "@/components/ShareButtons";
 import MarketplaceSidebarBanner from "@/components/MarketplaceSidebarBanner";
 import HighlightedRelatedStory from "@/components/HighlightedRelatedStory";
+import { Clock, User, ChevronLeft } from "lucide-react";
+import Link from "next/link";
 
 type Nota = {
   id: number;
@@ -24,17 +26,14 @@ type Nota = {
   created_at: string;
 };
 
-const SITE_BASE = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://diario.jujuyconecta.com")
-  .replace(/\/$/, "");
+const SITE_BASE = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://diario.jujuyconecta.com").replace(/\/$/, "");
 
-// Helper para limpiar HTML y sacar descripción
 function extractPlainText(html: string | null, maxLen = 160): string {
   if (!html) return "";
   const text = html.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
   return text.slice(0, maxLen);
 }
 
-// función común para no repetir la query
 async function getNotaBySlug(slug: string): Promise<Nota | null> {
   const { data, error } = await supabase
     .from("noticias")
@@ -42,261 +41,146 @@ async function getNotaBySlug(slug: string): Promise<Nota | null> {
     .eq("slug", slug)
     .eq("estado", "publicado")
     .single();
-
-  if (error) {
-    console.error("Error cargando noticia:", error);
-    return null;
-  }
-
+  if (error) return null;
   return data as Nota;
 }
 
-type RouteParams = {
-  params: Promise<{ slug: string }>;
-};
+type RouteParams = { params: Promise<{ slug: string }> };
 
-// ------- SEO dinámico para la nota --------
-export async function generateMetadata(
-  { params }: RouteParams,
-  parent: ResolvingMetadata
-): Promise<Metadata> {
+export async function generateMetadata({ params }: RouteParams, parent: ResolvingMetadata): Promise<Metadata> {
   const { slug } = await params;
   const nota = await getNotaBySlug(slug);
+  if (!nota) return { title: "Noticia no encontrada" };
 
-  if (!nota) {
-    return {
-      title: "Noticia no encontrada",
-      description: "La noticia que buscás no existe o fue eliminada.",
-      robots: { index: false, follow: false },
-    };
-  }
-
-  const url = new URL(`/nota/${nota.slug}`, SITE_BASE).toString();
-
-  const description =
-    nota.resumen ??
-    extractPlainText(nota.contenido, 160);
-
-  const published = nota.fecha_publicacion || nota.created_at;
-
-  const imageUrl = nota.imagen_url
-    ? (nota.imagen_url.startsWith("http")
-        ? nota.imagen_url
-        : new URL(nota.imagen_url, SITE_BASE).toString())
-    : undefined;
-
-  const images = imageUrl
-    ? [
-        {
-          url: imageUrl,
-          width: 1200,
-          height: 630,
-          alt: nota.titulo,
-        },
-      ]
-    : (await parent).openGraph?.images ?? [];
+  const url = `${SITE_BASE}/nota/${nota.slug}`;
+  const description = nota.resumen ?? extractPlainText(nota.contenido, 160);
+  const imageUrl = nota.imagen_url;
 
   return {
-    title: `${nota.titulo} | Jujuy Conecta Diario`,
+    title: `${nota.titulo} | Jujuy Conecta`,
     description,
-    alternates: {
-      canonical: url,
-    },
     openGraph: {
       type: "article",
       url,
       title: nota.titulo,
       description,
-      publishedTime: published,
-      modifiedTime: nota.created_at,
-      siteName: "Jujuy Conecta Diario",
-      images,
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: nota.titulo,
-      description,
-      images: images.length
-        ? images.map((i) => (typeof i === "string" ? i : url))
-        : undefined,
+      images: imageUrl ? [imageUrl] : [],
     },
   };
 }
 
-// ------- Página de la noticia --------
 export default async function NoticiaPage({ params }: RouteParams) {
   const { slug } = await params;
   const nota = await getNotaBySlug(slug);
 
-  if (!nota) {
-    notFound();
-  }
+  if (!nota) notFound();
 
   const publishedIso = nota.fecha_publicacion || nota.created_at;
   const fecha = new Date(publishedIso).toLocaleDateString("es-AR", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
+    day: "numeric", month: "long", year: "numeric"
   });
 
-  const url = `${SITE_BASE}/nota/${nota.slug}`;
-
-  const description =
-    nota.resumen ??
-    extractPlainText(nota.contenido, 200);
-
-  // Si guardás URL completa de Supabase, esto pasa directo
-  // Si alguna vez pasás a guardar solo el path, acá deberías generar el publicUrl de Supabase.
-  const imageUrl = nota.imagen_url
-    ? (nota.imagen_url.startsWith("http")
-        ? nota.imagen_url
-        : `${SITE_BASE}${nota.imagen_url.startsWith("/") ? "" : "/"}${nota.imagen_url}`)
-    : undefined;
-
-  // JSON-LD NewsArticle
-  const jsonLdArticle = {
-    "@context": "https://schema.org",
-    "@type": "NewsArticle",
-    headline: nota.titulo,
-    description,
-    image: imageUrl ? [imageUrl] : undefined,
-    datePublished: publishedIso,
-    dateModified: nota.created_at,
-    author: nota.autor
-      ? {
-          "@type": "Person",
-          name: nota.autor,
-        }
-      : {
-          "@type": "Organization",
-          name: "Redacción Jujuy Conecta",
-        },
-    publisher: {
-      "@type": "Organization",
-      name: "Jujuy Conecta Diario",
-      logo: {
-        "@type": "ImageObject",
-        url: `${SITE_BASE}/jc.png`,
-      },
-    },
-    mainEntityOfPage: {
-      "@type": "WebPage",
-      "@id": url,
-    },
-    articleSection: "Noticias",
-    inLanguage: "es-AR",
-  };
-
-  // JSON-LD Breadcrumbs
-  const jsonLdBreadcrumbs = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      {
-        "@type": "ListItem",
-        position: 1,
-        name: "Inicio",
-        item: SITE_BASE,
-      },
-      {
-        "@type": "ListItem",
-        position: 2,
-        name: "Noticias",
-        item: `${SITE_BASE}/`, // si después tenés secciones, acá va /seccion/x
-      },
-      {
-        "@type": "ListItem",
-        position: 3,
-        name: nota.titulo,
-        item: url,
-      },
-    ],
-  };
+  const imageUrl = nota.imagen_url;
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* JSON-LD para esta nota */}
-      <Script
-        id={`ld-json-article-${nota.id}`}
-        type="application/ld+json"
-        strategy="afterInteractive"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify([jsonLdArticle, jsonLdBreadcrumbs]),
-        }}
-      />
+    <div className="min-h-screen bg-[#020817]">
+      <main className="container mx-auto px-4 py-8 lg:py-12">
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-12">
+          
+          {/* COLUMNA PRINCIPAL DE LECTURA */}
+          <article className="xl:col-span-8">
+            
+            {/* Botón Volver */}
+            <Link href="/" className="inline-flex items-center gap-2 text-primary font-bold text-sm mb-8 hover:opacity-80 transition-opacity uppercase tracking-widest">
+              <ChevronLeft className="w-4 h-4" /> Volver al inicio
+            </Link>
 
-      <main className="container mx-auto px-4 py-10">
-        <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
-          {/* MAIN */}
-          <article className="xl:col-span-8 mx-auto w-full">
-            <header className="mb-8">
-              <h1 className="text-4xl md:text-5xl font-bold text-headline-primary mb-4 leading-tight">
+            <header className="mb-10">
+              <h1 className="text-4xl md:text-6xl font-black text-white mb-6 leading-[1.1] tracking-tighter">
                 {nota.titulo}
               </h1>
 
-              <div className="flex flex-wrap items-center gap-4 text-text-secondary text-sm">
-                <time dateTime={publishedIso}>{fecha}</time>
+              <div className="flex flex-wrap items-center gap-6 py-4 border-y border-white/10 text-slate-400 text-sm">
+                <div className="flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-primary" />
+                  <time dateTime={publishedIso}>{fecha}</time>
+                </div>
                 {nota.autor && (
-                  <>
-                    <span>•</span>
-                    <span>Por {nota.autor}</span>
-                  </>
+                  <div className="flex items-center gap-2">
+                    <User className="w-4 h-4 text-primary" />
+                    <span className="font-medium text-slate-300">Por {nota.autor}</span>
+                  </div>
                 )}
               </div>
             </header>
 
+            {/* Imagen Destacada */}
             {imageUrl && (
-              <figure className="mb-8 rounded-lg overflow-hidden border border-news-border">
-                {/* Paso 1: al menos usar next/image y sizes */}
-                <div className="relative w-full h-auto aspect-[16/9]">
+              <figure className="mb-10 relative rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl">
+                <div className="relative w-full aspect-[16/9]">
                   <Image
                     src={imageUrl}
                     alt={nota.titulo}
                     fill
-                    sizes="(max-width: 768px) 100vw, (max-width: 1280px) 75vw, 60vw"
+                    priority
                     className="object-cover"
-                    priority={false}
                   />
                 </div>
               </figure>
             )}
 
+            {/* Copete / Resumen */}
             {nota.resumen && (
-              <div className="bg-muted/50 border-l-4 border-primary p-6 mb-8 rounded-r-lg">
-                <p className="text-lg text-foreground/80 leading-relaxed italic">
-                  {nota.resumen}
+              <div className="relative mb-12 p-8 rounded-3xl bg-primary/5 border border-primary/20">
+                <div className="absolute top-0 left-8 -translate-y-1/2 bg-primary text-black text-[10px] font-black px-3 py-1 rounded-full uppercase">
+                  Resumen
+                </div>
+                <p className="text-xl md:text-2xl text-slate-200 leading-relaxed font-medium italic">
+                  "{nota.resumen}"
                 </p>
               </div>
             )}
+
+            {/* Cuerpo de la noticia */}
             <div className="mx-auto">
               <div
-                className="prose prose-lg max-w-none text-foreground leading-relaxed prose-headings:text-foreground prose-a:text-primary"
+                className="prose prose-invert prose-lg max-w-none 
+                prose-p:text-slate-300 prose-p:leading-[1.8] prose-p:mb-6
+                prose-headings:text-white prose-headings:font-black prose-headings:tracking-tighter
+                prose-a:text-primary prose-a:no-underline hover:prose-a:underline
+                prose-strong:text-white prose-img:rounded-3xl prose-img:border prose-img:border-white/10"
                 dangerouslySetInnerHTML={{ __html: nota.contenido ?? "" }}
               />
-              <HighlightedRelatedStory
-                noticiaId={nota.id}
-                categoriaId={nota.categoria_id}
-              />
-              <a
-                href="/"
-                className="inline-flex items-center gap-2 text-primary hover:underline mt-8 mb-6"
-              >
-                ← Volver al inicio
-              </a>
 
-              <ShareButtons titulo={nota.titulo} slug={nota.slug} />
-              <RatingStars noticiaId={nota.id} />
-              <Comments noticiaId={nota.id} />
+              <div className="mt-16 pt-8 border-t border-white/10 space-y-10">
+                <ShareButtons titulo={nota.titulo} slug={nota.slug} />
+                
+                <div className="p-8 rounded-3xl bg-white/[0.02] border border-white/10">
+                  <HighlightedRelatedStory noticiaId={nota.id} categoriaId={nota.categoria_id} />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <RatingStars noticiaId={nota.id} />
+                  <Comments noticiaId={nota.id} />
+                </div>
+              </div>
             </div>
           </article>
 
-          {/* ASIDE */}
-          <aside className="xl:col-span-4">
-            <div className="sticky top-28 space-y-4">
-              <RecentNewsList />
+          {/* ASIDE / SIDEBAR */}
+          <aside className="xl:col-span-4 space-y-8">
+            <div className="sticky top-28 space-y-8">
+              <div className="p-6 rounded-3xl bg-[#0a0f1d] border border-white/10">
+                <h2 className="text-lg font-black uppercase tracking-tighter text-white mb-6 flex items-center gap-2">
+                  <span className="w-2 h-2 bg-primary rounded-full" />
+                  Noticias Recientes
+                </h2>
+                <RecentNewsList />
+              </div>
               <MarketplaceSidebarBanner />
             </div>
           </aside>
+
         </div>
       </main>
     </div>
