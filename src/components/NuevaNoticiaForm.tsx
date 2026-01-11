@@ -121,7 +121,7 @@ export default function NuevaNoticiaForm({ data, setData, onCreated }: Props) {
     setSlug("");
   };
 
-  const inputStyles = "bg-white/5 border-white/10 focus:border-primary/50 text-white transition-all duration-300";
+  const inputStyles = "bg-white/5 border-white/10 focus:border-primary/50 text-black transition-all duration-300";
   const labelStyles = "text-[10px] uppercase tracking-widest font-black text-slate-500 flex items-center gap-2 mb-2";
 
   return (
@@ -143,7 +143,7 @@ export default function NuevaNoticiaForm({ data, setData, onCreated }: Props) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Categoría */}
-        <div className="space-y-2">
+        <div className="space-y-2 text-black">
           <Label className={labelStyles}>
             <FileText className="h-3 w-3" /> Categoría *
           </Label>

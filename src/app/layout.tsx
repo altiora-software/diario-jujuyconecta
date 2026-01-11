@@ -154,7 +154,7 @@ export default function RootLayout({
   const jsonLd = [jsonLdOrg, jsonLdWebsite];
 
   return (
-    <html lang="es-AR">
+    <html lang="es-AR" suppressHydrationWarning>
       <head>
         {/* Favicon e íconos principales */}
         <link rel="preconnect" href="https://www.googletagmanager.com" />
@@ -193,12 +193,12 @@ export default function RootLayout({
         <Script
           id="ld-json"
           type="application/ld+json"
-          strategy="afterInteractive"
+          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
       
-      <body className="dark bg-background text-foreground antialiased selection:bg-primary/30 min-h-screen relative overflow-x-hidden">
+      <body className="bg-background text-foreground antialiased selection:bg-primary/30 min-h-screen relative overflow-x-hidden">
         {/* Gradientes de fondo para coherencia visual */}
         <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
           <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-primary/5 blur-[120px]" />

@@ -144,13 +144,42 @@ export default async function NoticiaPage({ params }: RouteParams) {
             {/* Cuerpo de la noticia */}
             <div className="mx-auto">
               <div
-                className="prose prose-invert prose-lg max-w-none 
-                prose-p:text-slate-300 prose-p:leading-[1.8] prose-p:mb-6
-                prose-headings:text-white prose-headings:font-black prose-headings:tracking-tighter
-                prose-a:text-primary prose-a:no-underline hover:prose-a:underline
-                prose-strong:text-white prose-img:rounded-3xl prose-img:border prose-img:border-white/10"
+                className="
+                prose prose-invert prose-lg max-w-none
+
+                  text-white
+                  prose-p:leading-[1.8]
+                  prose-p:mb-6
+
+                  text-white
+                  prose-headings:font-black
+                  prose-headings:tracking-tighter
+
+                  prose-li:text-white
+                  prose-ul:text-white
+                  prose-ol:text-white
+
+                  text-white
+                  text-white
+
+                  prose-blockquote:text-white
+                  prose-blockquote:border-l-primary
+                  prose-blockquote:bg-white/5
+
+                  text-white
+                  prose-pre:bg-white/5
+                  prose-pre:text-white
+
+                  prose-a:text-primary
+                  prose-a:no-underline hover:prose-a:underline
+
+                  prose-img:rounded-3xl
+                  prose-img:border
+                  prose-img:border-white/10
+                "
                 dangerouslySetInnerHTML={{ __html: nota.contenido ?? "" }}
               />
+
 
               <div className="mt-16 pt-8 border-t border-white/10 space-y-10">
                 <ShareButtons titulo={nota.titulo} slug={nota.slug} />

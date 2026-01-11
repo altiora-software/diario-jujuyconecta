@@ -79,6 +79,23 @@ const config: Config = {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
       },
+      typography: {
+        dark: {
+          css: {
+            color: "#ffffff",
+            p: { color: "#ffffff" },
+            li: { color: "#ffffff" },
+            strong: { color: "#ffffff" },
+            h1: { color: "#ffffff" },
+            h2: { color: "#ffffff" },
+            h3: { color: "#ffffff" },
+            blockquote: {
+              color: "#ffffff",
+              borderLeftColor: "var(--tw-prose-links)",
+            },
+          },
+        },
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],

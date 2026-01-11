@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import UploadImage from "@/components/UploadImage";
 
 type Noticia = {
   id: number;
@@ -154,13 +155,36 @@ export default function EditarNoticiaPage() {
               </div>
 
               {/* Imagen */}
-              <div className="space-y-2">
-                <label className="font-medium">URL de Imagen</label>
-                <Input
-                  value={imagenUrl}
-                  onChange={(e) => setImagenUrl(e.target.value)}
+              <div className="space-y-3">
+                <label className="font-medium">Imagen de portada</label>
+
+                {imagenUrl ? (
+                  <div className="relative">
+                    <img
+                      src={imagenUrl}
+                      alt="Imagen actual"
+                      className="w-full max-h-64 object-cover rounded-md border"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Imagen actual
+                    </p>
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground">
+                    Esta noticia no tiene imagen
+                  </p>
+                )}
+
+                <UploadImage
+                  onUploaded={(url) => setImagenUrl(url)}
                 />
+
+                <p className="text-xs text-muted-foreground">
+                  Al subir una nueva imagen, se reemplaza la actual.
+                  Formatos JPG o PNG, relación 16:9 recomendada.
+                </p>
               </div>
+
 
               {/* Acciones */}
               <div className="flex justify-end gap-3 pt-4">
