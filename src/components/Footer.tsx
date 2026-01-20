@@ -31,7 +31,7 @@ const quickLinks = [
 
 export default function Footer() {
   return (
-    <footer className="relative bg-[#020817] text-white mt-20 border-t border-white/5 overflow-hidden">
+    <footer className="relative bg-[#020817] text-white border-t border-white/5 overflow-hidden">
       {/* Glow decorativo de fondo */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
       
@@ -51,7 +51,7 @@ export default function Footer() {
                 Jujuy<span className="text-primary">Conecta</span>
               </span>
             </Link>
-            <p className="text-slate-500 text-sm leading-relaxed font-medium italic">
+            <p className="text-secondary text-sm leading-relaxed font-medium italic">
               "El pulso de la provincia en tiempo real. Periodismo independiente con visión de futuro."
             </p>
             <div className="flex gap-3">
@@ -108,8 +108,8 @@ export default function Footer() {
           <div className="space-y-6">
             <div className="p-6 rounded-[2rem] bg-white/[0.02] border border-white/5 relative overflow-hidden group">
               <div className="absolute -right-4 -top-4 w-20 h-20 bg-primary/10 rounded-full blur-2xl group-hover:bg-primary/20 transition-colors" />
-              <h4 className="text-sm font-black uppercase tracking-widest mb-2 italic">Sumá tu negocio</h4>
-              <p className="text-xs text-slate-500 mb-4 font-medium">Aparecé en nuestro Marketplace y conectá con miles de lectores.</p>
+              <h4 className="text-sm font-bolt text-primary uppercase tracking-widest mb-2 italic">Sumá tu negocio</h4>
+              <p className="text-xs text-secondary mb-4 font-medium">Aparecé en nuestro Marketplace y conectá con miles de lectores.</p>
               <Link 
                 href="/servicios/marketplace" 
                 className="flex items-center gap-2 text-[10px] font-black uppercase tracking-tighter text-primary hover:gap-3 transition-all"

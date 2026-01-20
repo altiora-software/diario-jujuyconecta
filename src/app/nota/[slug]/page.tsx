@@ -147,6 +147,18 @@ export default async function NoticiaPage({ params }: RouteParams) {
                 className="
                 prose prose-invert prose-lg max-w-none
 
+                /* 1. Forzamos que los encabezados dentro de la nota sean blancos */
+      prose-h1:text-white
+      prose-h2:text-white
+      prose-h3:text-white
+      
+      /* 2. Forzamos que cualquier strong (esté donde esté) sea blanco */
+      prose-strong:text-white
+      prose-strong:font-bold
+      
+      /* 3. El 'truco' para los strong dentro de encabezados */
+      [&_h1_strong]:text-white
+      [&_h2_strong]:text-white
                   text-white
                   prose-p:leading-[1.8]
                   prose-p:mb-6

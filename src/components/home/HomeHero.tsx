@@ -30,7 +30,7 @@ function HomeHeroSkeleton() {
           {[1, 2, 3, 4].map((i) => (
             <div key={i} className="h-24 bg-white/5 rounded-2xl border border-white/5" />
           ))}
-        </div>
+        </div>z
       </div>
     </div>
   );
@@ -105,7 +105,7 @@ export function HomeHero() {
                     <CategoryBadge
                       label={principal.categoria.nombre}
                       slug={principal.categoria.slug}
-                      className="w-fit bg-primary text-[#020817] font-black border-none uppercase text-[10px] tracking-widest"
+                      className="w-fit bg-secondary text-[#020817] font-black border-none uppercase text-[10px] tracking-widest"
                     />
                   )}
                   

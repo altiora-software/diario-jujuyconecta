@@ -224,7 +224,7 @@ export default async function SeccionPage({ params }: PageProps) {
           <div className="flex items-center gap-4">
             <span className="w-2 h-12 bg-primary rounded-full shadow-[0_0_15px_rgba(16,185,129,0.5)]" />
             <div>
-              <h1 className="text-5xl md:text-6xl font-black uppercase tracking-tighter italic">
+              <h1 className="text-5xl md:text-6xl text-secondary uppercase tracking-tighter italic">
                 {slug}
               </h1>
               <p className="text-slate-400 font-medium mt-1">
@@ -260,7 +260,7 @@ export default async function SeccionPage({ params }: PageProps) {
           <aside className="xl:col-span-4 space-y-10">
             <div className="sticky top-28">
               <div className="p-8 rounded-[2.5rem] bg-white/[0.02] border border-white/10 backdrop-blur-sm">
-                <h2 className="text-xl font-black uppercase tracking-tighter mb-6 flex items-center gap-2 italic">
+                <h2 className="text-xl text-secondary uppercase tracking-tighter mb-6 flex items-center gap-2 italic">
                   <span className="w-2 h-2 bg-primary rounded-full animate-pulse" />
                   Lo más reciente
                 </h2>

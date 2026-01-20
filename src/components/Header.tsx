@@ -118,12 +118,12 @@ export default function Header() {
           {/* Right: search + CTA */}
           <div className="flex items-center space-x-3">
             <form action="/buscar" method="GET" className="relative hidden xl:block">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-secondary" />
               <Input 
                 type="search" 
                 name="q" 
                 placeholder="Buscar noticia..." 
-                className="pl-10 w-48 bg-white/5 border-white/10 focus:border-primary/50 rounded-full text-white placeholder:text-slate-600" 
+                className="pl-10 w-48 bg-white/5 border-white/10 focus:border-primary/50 rounded-full text-secondary placeholder:text-secondary" 
               />
             </form>
 

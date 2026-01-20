@@ -112,7 +112,7 @@ export default async function HomePage() {
         {/* FOOTER DE NOTICIAS */}
         <section className="pt-10 border-t border-white/10">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-            <h2 className="text-2xl font-black italic tracking-tighter uppercase">
+            <h2 className="text-2xl text-secondary italic tracking-tighter uppercase">
               Sigue Informado
             </h2>
             <Link href="/archivo" className="bg-white/5 hover:bg-white/10 border border-white/10 px-6 py-3 rounded-full text-sm font-bold transition-all">
