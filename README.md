@@ -1,6 +1,6 @@
 # 📰 Jujuy Conecta — Diario Digital
 
-Plataforma de noticias desarrollada por **Altiora Software** para un medio digital local, con foco en experiencia de lectura, flujo editorial y mantenibilidad técnica.
+Plataforma de noticias desarrollada por **Ethercode** para un medio digital local, con foco en experiencia de lectura, flujo editorial y mantenibilidad técnica.
 
 Proyecto en uso real, con panel de administración y control de acceso por roles.
 
@@ -65,8 +65,8 @@ Brindar a medios locales una plataforma propia para:
 
 ## 👥 Equipo
 
-Proyecto desarrollado por el equipo de **Altiora Software**.
-
+Proyecto desarrollado por el equipo de **Ethercode**.
+https://ethercode.com.ar/
 ---
 
 ## 🚀 Estado
@@ -77,5 +77,5 @@ Activo y en evolución, con mejoras continuas de UX y nuevas funcionalidades.
 
 ## 🌍 Contexto
 
-Proyecto desarrollado en Argentina para un medio digital local.
+Proyecto desarrollado en Argentina para un medio digital local. 
 
