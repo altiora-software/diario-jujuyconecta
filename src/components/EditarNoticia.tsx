@@ -207,12 +207,23 @@ export default function EditarNoticiaPage() {
           <div className="grid gap-1">
             <Label>Imagen de portada</Label>
             {imagenUrl && (
-              <img
-                src={imagenUrl}
-                alt="Portada"
-                className="h-40 w-full object-cover rounded-md border mb-2"
-              />
+              <div className="relative mb-2">
+                <img
+                  src={imagenUrl}
+                  alt="Portada actual"
+                  className="h-40 w-full object-cover rounded-md border"
+                />
+                <span className="absolute top-2 left-2 bg-black/70 text-white text-xs px-2 py-0.5 rounded">
+                  Imagen actual
+                </span>
+              </div>
             )}
+
+            <UploadImage
+              label={imagenUrl ? "Reemplazar imagen" : "Subir imagen"}
+              onUploaded={(url) => setImagenUrl(url)}
+            />
+
             <UploadImage onUploaded={(url) => setImagenUrl(url)} />
             <p className="text-xs text-muted-foreground">
               Formatos recomendados: JPG/PNG. Relación 16:9 sugerida. Tamaño ≥

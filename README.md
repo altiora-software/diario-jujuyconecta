@@ -1,36 +1,81 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 📰 Jujuy Conecta — Diario Digital
 
-## Getting Started
+Plataforma de noticias desarrollada por **Ethercode** para un medio digital local, con foco en experiencia de lectura, flujo editorial y mantenibilidad técnica.
 
-First, run the development server:
+Proyecto en uso real, con panel de administración y control de acceso por roles.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🎯 Objetivo del proyecto
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Brindar a medios locales una plataforma propia para:
+- publicar y gestionar noticias
+- trabajar de forma colaborativa entre redactores y editores
+- mantener control editorial sin depender de CMS genéricos
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## 🧩 Funcionalidades
 
-To learn more about Next.js, take a look at the following resources:
+### Público
+- Home editorial
+- Noticias por sección
+- Vista de nota optimizada para lectura
+- Navegación clara y rápida
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Panel de administración
+- Autenticación de usuarios
+- Roles: colaborador, editor y administrador
+- Creación, edición y publicación de noticias
+- Control de permisos a nivel base de datos (RLS)
+- Feedback visual mediante toasts y estados de acción
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## 🧠 Enfoque de desarrollo
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Arquitectura frontend modular
+- Componentes reutilizables
+- UI consistente y mantenible
+- Formularios con validación y feedback claro
+- Animaciones sutiles orientadas a UX
+- Diseño pensado para usuarios reales (redactores y editores)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## 🛠️ Stack tecnológico
+
+**Frontend**
+- Next.js
+- React
+- TypeScript
+- Tailwind CSS
+- Radix UI
+- React Hook Form
+- TanStack Query
+- Framer Motion
+
+**Backend**
+- Supabase (PostgreSQL + Auth + RLS)
+
+**Deploy**
+- Vercel
+
+---
+
+## 👥 Equipo
+
+Proyecto desarrollado por el equipo de **Ethercode**.
+https://ethercode.com.ar/
+---
+
+## 🚀 Estado
+
+Activo y en evolución, con mejoras continuas de UX y nuevas funcionalidades.
+
+---
+
+## 🌍 Contexto
+
+Proyecto desarrollado en Argentina para un medio digital local. 
+

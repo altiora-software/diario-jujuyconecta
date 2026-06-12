@@ -109,43 +109,39 @@ const RecentNewsList = ({ categorySlug }: Props) => {
   }, [categorySlug]);
 
   return (
-    <Card className="border border-news-border">
-      <CardHeader>
-        <CardTitle className="text-lg font-semibold text-headline-primary">
+    <Card className="bg-white/[0.02] backdrop-blur-md border-white/[0.05] shadow-2xl">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-lg font-bold tracking-tight bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent">
           Últimas noticias
         </CardTitle>
       </CardHeader>
 
       <CardContent>
-        {loading && <p className="text-sm text-muted-foreground">Cargando noticias…</p>}
+      {loading && <p className="text-sm text-muted-foreground animate-pulse">Cargando noticias…</p>}
         {error && <p className="text-sm text-destructive">{error}</p>}
-        {!loading && !error && noticias.length === 0 && (
-          <p className="text-sm text-muted-foreground">No hay noticias recientes.</p>
-        )}
-
+        
         {!loading && !error && noticias.length > 0 && (
-          <ul className="space-y-4">
+          <ul className="space-y-2">
             {noticias.map((nota) => {
               const fecha = new Date(nota.fecha_publicacion || nota.created_at).toLocaleDateString("es-AR", {
-                year: "numeric",
-                month: "short",
                 day: "numeric",
+                month: "short",
               });
 
               return (
                 <li key={nota.id}>
-                  <Link href={`/nota/${nota.slug}`} className="group flex gap-3 rounded-md p-2 hover:bg-muted/50 transition-colors">
+                  <Link href={`/nota/${nota.slug}`} className="group flex gap-3 rounded-xl p-2 hover:bg-white/[0.05] transition-all duration-300 border border-transparent hover:border-primary/20">
                     {nota.imagen_url && (
-                      <div className="w-20 h-20 rounded-md overflow-hidden flex-shrink-0">
-                        <img src={nota.imagen_url} alt={nota.titulo} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
+                      <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 border border-white/10">
+                        <img src={nota.imagen_url} alt={nota.titulo} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                       </div>
                     )}
 
-                    <div className="flex flex-col justify-between">
-                      <p className="text-sm font-medium text-foreground group-hover:text-primary line-clamp-2 group-hover:line-clamp-none transition-all">
+                    <div className="flex flex-col justify-center gap-1">
+                      <p className="text-sm font-medium text-slate-200 group-hover:text-primary leading-snug line-clamp-2 transition-colors">
                         {nota.titulo}
                       </p>
-                      <p className="text-xs text-primary font-bold">{fecha}</p>
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-primary/80">{fecha}</p>
                     </div>
                   </Link>
                 </li>

@@ -54,6 +54,8 @@ import {
 } from "lucide-react"
 import { toast as sonner } from "sonner"
 
+
+
 /* -------------------- TIPOS -------------------- */
 
 type Role = "admin" | "editor" | "colaborador" | null
@@ -274,6 +276,10 @@ export default function AdminPage() {
     setNoticias(prev => prev.filter(n => n.id !== id))
     setDeleteId(null)
   }
+  
+  const handleEdit = (id: number) => {
+    router.push(`/admin/editar/${id}`);
+  };
 
   /* -------------------- UI HELPERS -------------------- */
   const getEstadoBadge = (estado: string) =>
@@ -405,11 +411,16 @@ export default function AdminPage() {
                         </TableCell>
                         <TableCell>
                           <div className="flex justify-end gap-2">
-                            {canEdit(n) && (
-                              <Button size="sm" variant="outline">
-                                <Pencil className="h-4 w-4" />
-                              </Button>
-                            )}
+                          {canEdit(n) && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleEdit(n.id)}
+                              title="Editar noticia"
+                            >
+                              <Pencil className="h-4 w-4" />
+                          </Button>
+                        )}
                             {n.estado === "borrador" && canPublish() && (
                               <Button size="sm" onClick={() => publicar(n.id)}>
                                 <CheckCircle className="h-4 w-4" />
