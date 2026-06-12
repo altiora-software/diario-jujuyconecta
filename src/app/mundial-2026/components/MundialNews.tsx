@@ -89,12 +89,9 @@ export default async function MundialNews({ limit = 6 }: MundialNewsProps) {
           );
 
           return (
-            <Link
-              key={noticia.id}
-              href={`/nota/${noticia.slug}`}
-              className="group flex h-full flex-col overflow-hidden rounded-lg border border-white/10 bg-zinc-900/80 shadow-xl shadow-black/20 transition duration-300 hover:-translate-y-1 hover:border-emerald-400/50 hover:bg-zinc-900"
-            >
-              <div className="relative aspect-[16/9] overflow-hidden bg-zinc-800">
+            <Link key={noticia.id} href={`/nota/${noticia.slug}`} className="group block h-full">
+              <article className="flex h-full flex-col overflow-hidden rounded-lg border border-white/10 bg-zinc-900/80 shadow-xl shadow-black/20 transition duration-300 group-hover:-translate-y-1 group-hover:border-emerald-400/50 group-hover:bg-zinc-900">
+                <div className="relative aspect-[16/9] overflow-hidden bg-zinc-800">
                 {imageUrl ? (
                   <img
                     src={imageUrl}
@@ -115,23 +112,24 @@ export default async function MundialNews({ limit = 6 }: MundialNewsProps) {
                     {dateLabel}
                   </time>
                 )}
-              </div>
+                </div>
 
-              <article className="flex flex-1 flex-col p-5">
-                <h3 className="line-clamp-2 text-lg font-bold leading-tight text-zinc-50 transition-colors group-hover:text-emerald-300">
-                  {noticia.titulo}
-                </h3>
+                <div className="flex flex-1 flex-col p-5">
+                  <h3 className="line-clamp-2 text-lg font-bold leading-tight text-zinc-50 transition-colors group-hover:text-emerald-300">
+                    {noticia.titulo}
+                  </h3>
 
-                {noticia.resumen && (
-                  <p className="mt-3 line-clamp-3 text-sm leading-6 text-zinc-400">
-                    {noticia.resumen}
-                  </p>
-                )}
+                  {noticia.resumen && (
+                    <p className="mt-3 line-clamp-3 text-sm leading-6 text-zinc-400">
+                      {noticia.resumen}
+                    </p>
+                  )}
 
-                <span className="mt-auto inline-flex items-center gap-1 pt-5 text-sm font-bold text-emerald-300">
-                  Leer nota
-                  <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                </span>
+                  <span className="mt-auto inline-flex items-center gap-1 pt-5 text-sm font-bold text-emerald-300">
+                    Leer nota
+                    <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  </span>
+                </div>
               </article>
             </Link>
           );
