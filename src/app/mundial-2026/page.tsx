@@ -7,13 +7,15 @@ import MundialBracket from "./components/MundialBracket";
 
 export default function Mundial2026Page() {
   return (
-    <main className="container mx-auto px-4 py-8">
+    <main>
       <MundialHero />
-      <MundialTodayMatches />
-      <MundialArgentinaMatch /> 
-      <MundialGroups />
-      <MundialBracket />
-      <MundialNews />
+      <main className="container">
+        <MundialTodayMatches />
+        <MundialArgentinaMatch />
+        <MundialGroups />
+        <MundialBracket />
+        <MundialNews />
+      </main>
     </main>
   );
 }
