@@ -2,21 +2,31 @@
 
 ## Objetivo
 
-Crear un micrositio especial para el Mundial 2026.
+Crear un hub especial para la cobertura del Mundial 2026 dentro de Jujuy Conecta.
 
-## MVP
+## URL
 
-- Home
-- Fixture
-- Grupos
-- Noticias
+/mundial-2026
 
-## Fase 2
+## Componentes actuales
 
-- Encuestas
-- Predicciones
+- MundialHero
+- MundialTodayMatches
+- MundialArgentinaMatch
+- MundialGroups
+- MundialBracket
+- MundialNews
 
-## Fase 3
+## Decisiones
 
-- Estadísticas
-- Goleadores
+- Se utilizará una única página principal.
+- Las noticias se administran desde Supabase mediante la categoría mundial-2026.
+- Las noticias también pueden aparecer en Home.
+- La sección debe funcionar incluso sin APIs pagas.
+
+## Pendientes
+
+- Corregir enlaces de noticias.
+- Barra mundialista debajo del Header.
+- Accesos desde Home.
+- Evaluar integración futura con API-Football.
