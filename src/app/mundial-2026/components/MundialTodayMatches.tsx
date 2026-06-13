@@ -1,21 +1,25 @@
+type CountryCode = "ar" | "ma" | "br" | "jp" | "es" | "uy" | "fr" | "mx";
+
 type Match = {
   id: number;
   homeTeam: string;
   awayTeam: string;
-  homeFlag: string;
-  awayFlag: string;
+  homeCode: CountryCode;
+  awayCode: CountryCode;
   time: string;
   stadium: string;
   phase: string;
 };
+
+const getFlagUrl = (code: CountryCode) => `https://flagcdn.com/w80/${code}.png`;
 
 const matches: Match[] = [
   {
     id: 1,
     homeTeam: "Argentina",
     awayTeam: "Marruecos",
-    homeFlag: "🇦🇷",
-    awayFlag: "🇲🇦",
+    homeCode: "ar",
+    awayCode: "ma",
     time: "13:00",
     stadium: "MetLife Stadium",
     phase: "Fase de grupos",
@@ -24,8 +28,8 @@ const matches: Match[] = [
     id: 2,
     homeTeam: "Brasil",
     awayTeam: "Japón",
-    homeFlag: "🇧🇷",
-    awayFlag: "🇯🇵",
+    homeCode: "br",
+    awayCode: "jp",
     time: "16:00",
     stadium: "SoFi Stadium",
     phase: "Fase de grupos",
@@ -34,8 +38,8 @@ const matches: Match[] = [
     id: 3,
     homeTeam: "España",
     awayTeam: "Uruguay",
-    homeFlag: "🇪🇸",
-    awayFlag: "🇺🇾",
+    homeCode: "es",
+    awayCode: "uy",
     time: "19:00",
     stadium: "AT&T Stadium",
     phase: "Fase de grupos",
@@ -44,8 +48,8 @@ const matches: Match[] = [
     id: 4,
     homeTeam: "Francia",
     awayTeam: "México",
-    homeFlag: "🇫🇷",
-    awayFlag: "🇲🇽",
+    homeCode: "fr",
+    awayCode: "mx",
     time: "22:00",
     stadium: "Estadio Azteca",
     phase: "Fase de grupos",
@@ -93,7 +97,11 @@ export default function MundialTodayMatches() {
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex min-w-0 items-center gap-3">
                       <span className="grid size-10 place-items-center rounded-full bg-white text-2xl shadow-md">
-                        {match.homeFlag}
+                        <img
+                          src={getFlagUrl(match.homeCode)}
+                          alt={`Bandera de ${match.homeTeam}`}
+                          className="h-6 w-8 rounded-sm object-cover"
+                        />
                       </span>
                       <span className="truncate text-base font-bold">
                         {match.homeTeam}
@@ -107,7 +115,11 @@ export default function MundialTodayMatches() {
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex min-w-0 items-center gap-3">
                       <span className="grid size-10 place-items-center rounded-full bg-white text-2xl shadow-md">
-                        {match.awayFlag}
+                        <img
+                          src={getFlagUrl(match.awayCode)}
+                          alt={`Bandera de ${match.awayTeam}`}
+                          className="h-6 w-8 rounded-sm object-cover"
+                        />
                       </span>
                       <span className="truncate text-base font-bold">
                         {match.awayTeam}
