@@ -3,6 +3,7 @@ import { Flag, Sparkles } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 import type { Match } from "../data/matches";
+import { getFlagUrl } from "../data/team-flags";
 import FixtureMatchCard from "./FixtureMatchCard";
 
 type FixtureArgentinaProps = {
@@ -10,6 +11,8 @@ type FixtureArgentinaProps = {
 };
 
 export default function FixtureArgentina({ matches }: FixtureArgentinaProps) {
+  const argentinaFlagUrl = getFlagUrl("Argentina");
+
   if (matches.length === 0) {
     return null;
   }
@@ -24,7 +27,16 @@ export default function FixtureArgentina({ matches }: FixtureArgentinaProps) {
       <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div className="max-w-3xl">
           <Badge className="mb-4 border border-emerald-300/30 bg-emerald-300/10 text-emerald-100 hover:bg-emerald-300/10">
-            <Flag className="mr-2 h-3.5 w-3.5" />
+            {argentinaFlagUrl ? (
+              <img
+                src={argentinaFlagUrl}
+                alt="Bandera de Argentina"
+                className="mr-2 h-3.5 w-5 rounded-[2px] border border-white/20 object-cover"
+                loading="lazy"
+              />
+            ) : (
+              <Flag className="mr-2 h-3.5 w-3.5" />
+            )}
             Selección Argentina
           </Badge>
 

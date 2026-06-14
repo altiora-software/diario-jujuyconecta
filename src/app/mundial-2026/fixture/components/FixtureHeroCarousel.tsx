@@ -6,7 +6,10 @@ import { CalendarClock, MapPin } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
+import { AnimatePresence, motion } from "framer-motion";
+
 import type { Match } from "../data/matches";
+import { getFlagUrl } from "../data/team-flags";
 import {
   cleanText,
   formatMatchTime,
@@ -61,30 +64,39 @@ export default function FixtureHeroCarousel({ day }: FixtureHeroCarouselProps) {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-center">
-        <article className="rounded-md border border-cyan-300/20 bg-gradient-to-br from-cyan-400/10 via-zinc-900 to-emerald-400/10 p-4">
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-            <Badge className="border border-cyan-400/25 bg-cyan-400/10 text-cyan-100 hover:bg-cyan-400/10">
-              {cleanText(activeMatch.group)}
-            </Badge>
-            <div className="flex items-center gap-2 text-sm font-black tabular-nums text-emerald-200">
-              <CalendarClock className="h-4 w-4 text-cyan-300" />
-              {formatMatchTime(activeMatch.time)}
+       
+      <AnimatePresence mode="wait">
+          <motion.article  
+            key={activeMatch.id}   
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.35 }}
+            className="rounded-md border border-cyan-300/20 bg-gradient-to-br from-cyan-400/10 via-zinc-900 to-emerald-400/10 p-4">
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+              <Badge className="border border-cyan-400/25 bg-cyan-400/10 text-cyan-100 hover:bg-cyan-400/10">
+                {cleanText(activeMatch.group)}
+              </Badge>
+              <div className="flex items-center gap-2 text-sm font-black tabular-nums text-emerald-200">
+                <CalendarClock className="h-4 w-4 text-cyan-300" />
+                {formatMatchTime(activeMatch.time)}
+              </div>
             </div>
-          </div>
 
-          <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
-            <TeamLabel match={activeMatch} side="home" />
-            <span className="rounded-full border border-white/10 bg-black/25 px-3 py-1 text-xs font-black text-zinc-400">
-              VS
-            </span>
-            <TeamLabel match={activeMatch} side="away" />
-          </div>
+            <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+              <TeamLabel match={activeMatch} side="home" />
+              <span className="rounded-full border border-white/10 bg-black/25 px-3 py-1 text-xs font-black text-zinc-400">
+                VS
+              </span>
+              <TeamLabel match={activeMatch} side="away" />
+            </div>
 
-          <div className="mt-4 flex items-start gap-2 rounded-md border border-white/10 bg-black/25 px-3 py-3 text-sm text-zinc-300">
-            <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-cyan-300" />
-            <span>{cleanText(activeMatch.stadium)}</span>
-          </div>
-        </article>
+            <div className="mt-4 flex items-start gap-2 rounded-md border border-white/10 bg-black/25 px-3 py-3 text-sm text-zinc-300">
+              <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-cyan-300" />
+              <span>{cleanText(activeMatch.stadium)}</span>
+            </div>
+          </motion.article>
+        </AnimatePresence>
 
         <div className="flex gap-2 overflow-x-auto lg:max-w-[16rem] lg:flex-wrap lg:justify-end">
           {matches.map((match, index) => (
@@ -108,16 +120,34 @@ export default function FixtureHeroCarousel({ day }: FixtureHeroCarouselProps) {
 
 function TeamLabel({ match, side }: { match: Match; side: "home" | "away" }) {
   const isHome = side === "home";
-  const name = isHome ? match.homeTeam : match.awayTeam;
+  const name = cleanText(isHome ? match.homeTeam : match.awayTeam);
+  const flagUrl = getFlagUrl(name);
 
   return (
     <span
       className={cn(
-        "min-w-0 text-balance text-lg font-black leading-tight text-white sm:text-2xl",
-        isHome ? "text-right" : "text-left",
+        "flex min-w-0 items-center gap-2 text-lg font-black leading-tight text-white sm:gap-3 sm:text-2xl",
+        isHome ? "justify-end text-right" : "justify-start text-left",
       )}
     >
-      {cleanText(name)}
+      {isHome && <FlagImage url={flagUrl} team={name} />}
+      <span className="min-w-0 text-balance">{name}</span>
+      {!isHome && <FlagImage url={flagUrl} team={name} />}
     </span>
+  );
+}
+
+function FlagImage({ url, team }: { url: string | null; team: string }) {
+  if (!url) {
+    return null;
+  }
+
+  return (
+    <img
+      src={url}
+      alt={`Bandera de ${team}`}
+      className="h-6 w-8 shrink-0 rounded-[3px] border border-white/20 object-cover shadow-sm shadow-black/30 sm:h-7 sm:w-10"
+      loading="lazy"
+    />
   );
 }

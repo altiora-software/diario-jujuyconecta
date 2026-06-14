@@ -54,7 +54,7 @@ export default function FixtureHero({
             <FixtureHeroActions />
           </div>
 {/* CARD DERECHA  */}
-          <Card className="border-emerald-400/20 bg-slate-900/80 text-white shadow-2xl shadow-emerald-950/30 backdrop-blur">
+          <Card className="border-emerald-400/20 bg-slatz-900/80 text-white shadow-2xl shadow-emerald-950/30 backdrop-blur">
             <CardContent className="p-6 sm:p-8">
               <div className="mb-8 flex h-16 w-16 items-center justify-center rounded-xl border border-emerald-400/25 bg-emerald-500/10">
                 <Trophy className="h-9 w-9 text-emerald-300" />
@@ -67,9 +67,9 @@ export default function FixtureHero({
                   value={`${featuredDay.matches.length} partidos`}
                 />
                 {/* PROX DE ARG  */}        
-                <StatRow label={<>Pr&oacute;ximo de Argentina</>} value={argentinaDate} />
+                <StatRow label={<>Pr&oacute;ximo Argentina</>} value={argentinaDate} />
                 {/* GEUPO  */}
-                <StatRow label="Grupo" value={argentinaGroup} />
+                {/* <StatRow label="Grupo" value={argentinaGroup} /> */}
                 <div className="rounded-md border border-cyan-400/20 bg-cyan-400/10 p-4">
                   <div className="flex items-center gap-3 text-cyan-100">
                     <CalendarDays className="h-5 w-5 text-cyan-300" />
@@ -95,7 +95,7 @@ function StatRow({ label, value }: { label: ReactNode; value: string }) {
       <span className="text-sm font-medium uppercase tracking-[0.18em] text-slate-400">
         {label}
       </span>
-      <span className="text-right text-2xl font-black text-emerald-300 sm:text-3xl">
+      <span className="text-right text-xl font-bold text-emerald-300 sm:text-2xl">
         {value}
       </span>
     </div>

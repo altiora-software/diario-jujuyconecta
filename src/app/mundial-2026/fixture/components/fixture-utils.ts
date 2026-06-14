@@ -54,10 +54,25 @@ const heroDateFormatter = new Intl.DateTimeFormat("es-AR", {
 });
 
 export function cleanText(value: string) {
-  return Object.entries(mojibakeMap).reduce(
+  const normalized = Object.entries(mojibakeMap).reduce(
     (text, [broken, fixed]) => text.replaceAll(broken, fixed),
     value,
   );
+
+  if (!/[ÃÂ]/.test(normalized)) {
+    return normalized;
+  }
+
+  try {
+    const bytes = Uint8Array.from(normalized, (char) => char.charCodeAt(0));
+    return new TextDecoder("utf-8", { fatal: true })
+      .decode(bytes)
+      .replaceAll("1º", "1.º")
+      .replaceAll("2º", "2.º")
+      .replaceAll("3º", "3.º");
+  } catch {
+    return normalized;
+  }
 }
 
 function getMatchDateKey(date = new Date()) {
@@ -155,16 +170,30 @@ export function getArgentinaGroup(matches: Match[]) {
 }
 
 export function getMatchesForToday(matches: Match[]) {
-  const today = new Date();
+  return getMatchesForDate(matches);
+}
 
-  const todayString =
-    today.getFullYear() +
-    "-" +
-    String(today.getMonth() + 1).padStart(2, "0") +
-    "-" +
-    String(today.getDate()).padStart(2, "0");
+export function getArgentinaGroupTeams(matches: Match[]) {
+  const argentinaGroup = getArgentinaGroup(matches);
+  const teams = matches
+    .filter((match) => cleanText(match.group) === argentinaGroup)
+    .flatMap((match) => [cleanText(match.homeTeam), cleanText(match.awayTeam)])
+    .filter((team) => !/Grupo|Ganador|Perdedor/.test(team));
 
-  return matches.filter(
-    (match) => match.date === todayString
+  return Array.from(new Set(teams));
+}
+
+export function getTournamentSummary(matches: Match[]) {
+  const groups = new Set(
+    matches
+      .map((match) => cleanText(match.group))
+      .filter((group) => group.startsWith("Grupo ")),
   );
+  const stadiums = new Set(matches.map((match) => cleanText(match.stadium)));
+
+  return {
+    matchesCount: matches.length,
+    groupsCount: groups.size,
+    stadiumsCount: stadiums.size,
+  };
 }

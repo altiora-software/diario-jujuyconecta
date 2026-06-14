@@ -9,8 +9,8 @@ import { matches } from "./fixture/data/matches";
 
 import {
   isArgentinaMatch,
-  getArgentinaGroup,
-  getCurrentOrNextMatchDay,
+    getArgentinaGroup,
+    getCurrentOrNextMatchDay,
   getNextArgentinaMatch,
 } from "./fixture/components/fixture-utils";
 

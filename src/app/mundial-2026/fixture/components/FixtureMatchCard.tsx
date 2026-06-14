@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 import type { Match } from "../data/matches";
+import { getFlagUrl } from "../data/team-flags";
 import { cleanText, formatMatchTime, isArgentinaMatch } from "./fixture-utils";
 
 type FixtureMatchCardProps = {
@@ -76,14 +77,35 @@ function TeamName({
   name: string;
   align: "left" | "right";
 }) {
+  const flagUrl = getFlagUrl(name);
+
   return (
     <span
       className={cn(
-        "min-w-0 text-balance text-base font-black leading-tight text-white sm:text-lg",
-        align === "right" ? "text-right" : "text-left",
+        "flex min-w-0 items-center gap-2 text-base font-black leading-tight text-white sm:text-lg",
+        align === "right"
+          ? "justify-end text-right"
+          : "justify-start text-left",
       )}
     >
-      {name}
+      {align === "right" && <FlagImage url={flagUrl} team={name} />}
+      <span className="min-w-0 text-balance">{name}</span>
+      {align === "left" && <FlagImage url={flagUrl} team={name} />}
     </span>
+  );
+}
+
+function FlagImage({ url, team }: { url: string | null; team: string }) {
+  if (!url) {
+    return null;
+  }
+
+  return (
+    <img
+      src={url}
+      alt={`Bandera de ${team}`}
+      className="h-5 w-7 shrink-0 rounded-[3px] border border-white/20 object-cover shadow-sm shadow-black/30 sm:h-6 sm:w-8"
+      loading="lazy"
+    />
   );
 }

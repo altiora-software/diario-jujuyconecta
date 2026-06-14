@@ -1,27 +1,16 @@
 import { matches } from "../fixture/data/matches";
-import { getMatchesForToday } from "../fixture/components/fixture-utils";
-
-type CountryCode = "ar" | "ma" | "br" | "jp" | "es" | "uy" | "fr" | "mx";
-
-type Match = {
-  id: number;
-  homeTeam: string;
-  awayTeam: string;
-  homeCode: CountryCode;
-  awayCode: CountryCode;
-  time: string;
-  stadium: string;
-  phase: string;
-};
-
-const getFlagUrl = (code: CountryCode) => `https://flagcdn.com/w80/${code}.png`;
+import {
+  cleanText,
+  getMatchesForToday,
+} from "../fixture/components/fixture-utils";
+import { getFlagUrl } from "../fixture/data/team-flags";
 
 const todayMatches = getMatchesForToday(matches);
 
 
 export default function MundialTodayMatches() {
   return (
-    <section className="w-full bg-zinc-950 px-4 py-8 text-white sm:px-6 lg:px-8">
+    <section id="#partidos-hoy" className="w-full bg-zinc-950 px-4 py-8 text-white sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
         <div className="mb-6 flex items-end justify-between gap-4">
           <div>
@@ -47,7 +36,7 @@ export default function MundialTodayMatches() {
               <div className="border-b border-white/10 bg-gradient-to-r from-cyan-500/15 via-zinc-900 to-emerald-500/10 px-4 py-3">
                 <div className="flex items-center justify-between gap-3">
                   <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-zinc-200">
-                    {match.phase}
+                    {cleanText(match.group)}
                   </span>
                   <time className="text-lg font-black tabular-nums text-cyan-300">
                     {match.time}
@@ -60,14 +49,10 @@ export default function MundialTodayMatches() {
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex min-w-0 items-center gap-3">
                       <span className="grid size-10 place-items-center rounded-full bg-white text-2xl shadow-md">
-                        <img
-                          src={getFlagUrl(match.homeCode)}
-                          alt={`Bandera de ${match.homeTeam}`}
-                          className="h-6 w-8 rounded-sm object-cover"
-                        />
+                        <FlagImage team={cleanText(match.homeTeam)} />
                       </span>
                       <span className="truncate text-base font-bold">
-                        {match.homeTeam}
+                        {cleanText(match.homeTeam)}
                       </span>
                     </div>
                     <span className="text-xs font-bold uppercase text-zinc-500">
@@ -78,14 +63,10 @@ export default function MundialTodayMatches() {
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex min-w-0 items-center gap-3">
                       <span className="grid size-10 place-items-center rounded-full bg-white text-2xl shadow-md">
-                        <img
-                          src={getFlagUrl(match.awayCode)}
-                          alt={`Bandera de ${match.awayTeam}`}
-                          className="h-6 w-8 rounded-sm object-cover"
-                        />
+                        <FlagImage team={cleanText(match.awayTeam)} />
                       </span>
                       <span className="truncate text-base font-bold">
-                        {match.awayTeam}
+                        {cleanText(match.awayTeam)}
                       </span>
                     </div>
                     <span className="text-xs font-bold uppercase text-zinc-500">
@@ -99,7 +80,7 @@ export default function MundialTodayMatches() {
                     Estadio
                   </p>
                   <p className="mt-1 truncate text-sm font-medium text-zinc-200">
-                    {match.stadium}
+                    {cleanText(match.stadium)}
                   </p>
                 </div>
               </div>
@@ -108,5 +89,22 @@ export default function MundialTodayMatches() {
         </div>
       </div>
     </section>
+  );
+}
+
+function FlagImage({ team }: { team: string }) {
+  const flagUrl = getFlagUrl(team);
+
+  if (!flagUrl) {
+    return null;
+  }
+
+  return (
+    <img
+      src={flagUrl}
+      alt={`Bandera de ${team}`}
+      className="h-6 w-8 rounded-sm object-cover"
+      loading="lazy"
+    />
   );
 }

@@ -18,7 +18,7 @@ export default function FixtureHeroActions() {
     <div className="mt-8 flex flex-col gap-3 sm:flex-row">
       <Button
         type="button"
-        onClick={() => scrollToSection("partidos-hoy")}
+        onClick={() => scrollToSection("#partidos-hoy")}
         className="bg-emerald-500 text-slate-950 hover:bg-emerald-400"
       >
         Ver partidos de hoy
