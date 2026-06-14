@@ -8,8 +8,13 @@ Crear un hub especial para la cobertura del Mundial 2026 dentro de Jujuy Conecta
 
 /mundial-2026
 
-## Componentes actuales
+## Estado actual
 
+MVP funcional desplegable.
+
+## Componentes implementados
+
+- MundialTopBanner
 - MundialHero
 - MundialTodayMatches
 - MundialArgentinaMatch
@@ -17,16 +22,44 @@ Crear un hub especial para la cobertura del Mundial 2026 dentro de Jujuy Conecta
 - MundialBracket
 - MundialNews
 
-## Decisiones
+## Funcionalidades implementadas
 
-- Se utilizará una única página principal.
-- Las noticias se administran desde Supabase mediante la categoría mundial-2026.
-- Las noticias también pueden aparecer en Home.
-- La sección debe funcionar incluso sin APIs pagas.
+- Hub mundialista independiente.
+- Categoría mundial-2026 creada en Supabase.
+- Noticias filtradas por categoría.
+- Visualización de noticias con imagen destacada.
+- Banner global debajo del Header.
+- Sección de próximos partidos destacados.
+- Tabla de grupos.
+- Llave eliminatoria.
+- Cobertura especial de Argentina.
 
-## Pendientes
+## Decisiones tomadas
 
-- Corregir enlaces de noticias.
-- Barra mundialista debajo del Header.
-- Accesos desde Home.
-- Evaluar integración futura con API-Football.
+- Una única página principal para el Mundial.
+- Sin APIs pagas.
+- Datos mock durante la primera etapa.
+- Noticias administradas desde Supabase.
+- Las noticias mundialistas pueden aparecer también en Home.
+- Se prioriza visibilidad y experiencia visual antes que automatización.
+
+## Próximos pasos
+
+### Prioridad alta
+
+- Corregir navegación hacia noticia individual.
+- Agregar bloque Mundial 2026 en Home.
+- Mejorar Hero con imagen mundialista.
+
+### Prioridad media
+
+- Banderas reales para selecciones.
+- Próximos partidos de Argentina.
+- SEO específico para Mundial 2026.
+
+### Futuro
+
+- Fixture completo.
+- Resultados reales.
+- Tablas automáticas.
+- Integración con APIs gratuitas si aportan valor.
