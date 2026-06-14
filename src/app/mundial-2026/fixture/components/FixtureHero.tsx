@@ -53,7 +53,7 @@ export default function FixtureHero({
 
             <FixtureHeroActions />
           </div>
-
+{/* CARD DERECHA  */}
           <Card className="border-emerald-400/20 bg-slate-900/80 text-white shadow-2xl shadow-emerald-950/30 backdrop-blur">
             <CardContent className="p-6 sm:p-8">
               <div className="mb-8 flex h-16 w-16 items-center justify-center rounded-xl border border-emerald-400/25 bg-emerald-500/10">
@@ -61,11 +61,14 @@ export default function FixtureHero({
               </div>
 
               <div className="grid gap-4">
+                {/* HOY SE JUEGAN  */}
                 <StatRow
                   label="Hoy se juegan"
                   value={`${featuredDay.matches.length} partidos`}
                 />
+                {/* PROX DE ARG  */}        
                 <StatRow label={<>Pr&oacute;ximo de Argentina</>} value={argentinaDate} />
+                {/* GEUPO  */}
                 <StatRow label="Grupo" value={argentinaGroup} />
                 <div className="rounded-md border border-cyan-400/20 bg-cyan-400/10 p-4">
                   <div className="flex items-center gap-3 text-cyan-100">

@@ -6,6 +6,8 @@ export type MatchDay = {
   matches: Match[];
 };
 
+
+
 const mojibakeMap: Record<string, string> = {
   "MÃ©xico": "México",
   "SudÃ¡frica": "Sudáfrica",
@@ -150,4 +152,19 @@ export function getNextArgentinaMatch(matches: Match[], date = getMatchDateKey()
 
 export function getArgentinaGroup(matches: Match[]) {
   return cleanText(matches.find(isArgentinaMatch)?.group ?? "A confirmar");
+}
+
+export function getMatchesForToday(matches: Match[]) {
+  const today = new Date();
+
+  const todayString =
+    today.getFullYear() +
+    "-" +
+    String(today.getMonth() + 1).padStart(2, "0") +
+    "-" +
+    String(today.getDate()).padStart(2, "0");
+
+  return matches.filter(
+    (match) => match.date === todayString
+  );
 }

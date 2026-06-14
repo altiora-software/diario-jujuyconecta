@@ -1,21 +1,50 @@
-import MundialArgentinaMatch from "./components/MundialArgentinaMatch";
-import MundialHero from "./components/MundialHero";
-import MundialNews from "./components/MundialNews";
 import MundialTodayMatches from "./components/MundialTodayMatches";
+import MundialNews from "./components/MundialNews";
 import MundialGroups from "./components/MundialGroups";
 import MundialBracket from "./components/MundialBracket";
+import FixtureHero from "./fixture/components/FixtureHero";
+import FixtureArgentina from "./fixture/components/FixtureArgentina";
+import { matches } from "./fixture/data/matches";
+
+
+import {
+  isArgentinaMatch,
+  getArgentinaGroup,
+  getCurrentOrNextMatchDay,
+  getNextArgentinaMatch,
+} from "./fixture/components/fixture-utils";
 
 export default function Mundial2026Page() {
+  const featuredDay = getCurrentOrNextMatchDay(matches);
+
+const nextArgentinaMatch = getNextArgentinaMatch(matches);
+const argentinaMatches = matches.filter(isArgentinaMatch);
+
+const argentinaGroup = getArgentinaGroup(matches);
   return (
-    <main>
-      <MundialHero />
-      <main className="container">
+    <main className="min-h-screen bg-zinc-950 text-white">
+       <FixtureHero
+        argentinaGroup={argentinaGroup}
+        featuredDay={featuredDay}
+        nextArgentinaMatch={nextArgentinaMatch}
+      />
+
+    <div className="mx-auto max-w-7xl space-y-12 px-4 py-10 sm:px-6 lg:px-8">
+        <FixtureArgentina matches={argentinaMatches} />
+
+        <div id="grupos">
+          {/* <MundialGroups /> */}
+        </div>
+
+        <div id="llaves">
+          {/* <MundialBracket /> */}
+        </div>
+
         <MundialTodayMatches />
-        <MundialArgentinaMatch />
-        <MundialGroups />
-        <MundialBracket />
-        <MundialNews />
-      </main>
+        <div id="noticias">
+          {/* <MundialNews /> */}
+        </div>
+      </div>
     </main>
   );
 }

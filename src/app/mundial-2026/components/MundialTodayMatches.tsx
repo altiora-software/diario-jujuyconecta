@@ -1,3 +1,6 @@
+import { matches } from "../fixture/data/matches";
+import { getMatchesForToday } from "../fixture/components/fixture-utils";
+
 type CountryCode = "ar" | "ma" | "br" | "jp" | "es" | "uy" | "fr" | "mx";
 
 type Match = {
@@ -13,48 +16,8 @@ type Match = {
 
 const getFlagUrl = (code: CountryCode) => `https://flagcdn.com/w80/${code}.png`;
 
-const matches: Match[] = [
-  {
-    id: 1,
-    homeTeam: "Argentina",
-    awayTeam: "Marruecos",
-    homeCode: "ar",
-    awayCode: "ma",
-    time: "13:00",
-    stadium: "MetLife Stadium",
-    phase: "Fase de grupos",
-  },
-  {
-    id: 2,
-    homeTeam: "Brasil",
-    awayTeam: "Japón",
-    homeCode: "br",
-    awayCode: "jp",
-    time: "16:00",
-    stadium: "SoFi Stadium",
-    phase: "Fase de grupos",
-  },
-  {
-    id: 3,
-    homeTeam: "España",
-    awayTeam: "Uruguay",
-    homeCode: "es",
-    awayCode: "uy",
-    time: "19:00",
-    stadium: "AT&T Stadium",
-    phase: "Fase de grupos",
-  },
-  {
-    id: 4,
-    homeTeam: "Francia",
-    awayTeam: "México",
-    homeCode: "fr",
-    awayCode: "mx",
-    time: "22:00",
-    stadium: "Estadio Azteca",
-    phase: "Fase de grupos",
-  },
-];
+const todayMatches = getMatchesForToday(matches);
+
 
 export default function MundialTodayMatches() {
   return (
@@ -76,7 +39,7 @@ export default function MundialTodayMatches() {
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {matches.map((match) => (
+          {todayMatches.map((match) => (
             <article
               key={match.id}
               className="group overflow-hidden rounded-lg border border-white/10 bg-zinc-900/80 shadow-xl shadow-black/20 transition duration-300 hover:-translate-y-1 hover:border-cyan-400/50 hover:bg-zinc-900"
