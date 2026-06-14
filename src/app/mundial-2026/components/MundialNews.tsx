@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { CalendarDays, ChevronRight, Newspaper } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+export const dynamic = "force-dynamic"; 
 type MundialNewsProps = {
   limit?: number;
 };
@@ -42,6 +43,8 @@ async function getMundialNews(limit: number) {
     .order("created_at", { ascending: false })
     .limit(limit);
   if (error) throw error;
+  console.log("categoria", categoria);
+  console.log("noticias", data);
   return (data ?? []) as NoticiaMundial[];
 }
 export default async function MundialNews({ limit = 6 }: MundialNewsProps) {
