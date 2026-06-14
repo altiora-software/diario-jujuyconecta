@@ -1,21 +1,29 @@
 import FixtureArgentina from "./components/FixtureArgentina";
 import FixtureDateSelector from "./components/FixtureDateSelector";
 import FixtureHero from "./components/FixtureHero";
-import { groupMatchesByDate, isArgentinaMatch } from "./components/fixture-utils";
+import {
+  getArgentinaGroup,
+  getCurrentOrNextMatchDay,
+  getNextArgentinaMatch,
+  groupMatchesByDate,
+  isArgentinaMatch,
+} from "./components/fixture-utils";
 import { matches } from "./data/matches";
 
 export default function FixturePage() {
-  const totalGroups = new Set(
-    matches
-      .filter((match) => match.group.startsWith("Grupo "))
-      .map((match) => match.group),
-  ).size;
   const argentinaMatches = matches.filter(isArgentinaMatch);
   const matchDays = groupMatchesByDate(matches);
+  const featuredDay = getCurrentOrNextMatchDay(matches);
+  const nextArgentinaMatch = getNextArgentinaMatch(matches);
+  const argentinaGroup = getArgentinaGroup(matches);
 
   return (
     <main className="min-h-screen bg-zinc-950 text-white">
-      <FixtureHero totalMatches={matches.length} totalGroups={totalGroups} />
+      <FixtureHero
+        argentinaGroup={argentinaGroup}
+        featuredDay={featuredDay}
+        nextArgentinaMatch={nextArgentinaMatch}
+      />
 
       <div className="mx-auto max-w-7xl space-y-12 px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
         <FixtureArgentina matches={argentinaMatches} />

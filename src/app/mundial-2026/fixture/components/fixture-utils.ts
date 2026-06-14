@@ -45,11 +45,49 @@ const shortDateFormatter = new Intl.DateTimeFormat("es-AR", {
   timeZone: "UTC",
 });
 
+const heroDateFormatter = new Intl.DateTimeFormat("es-AR", {
+  day: "numeric",
+  month: "long",
+  timeZone: "UTC",
+});
+
 export function cleanText(value: string) {
   return Object.entries(mojibakeMap).reduce(
     (text, [broken, fixed]) => text.replaceAll(broken, fixed),
     value,
   );
+}
+
+function getMatchDateKey(date = new Date()) {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    day: "2-digit",
+    month: "2-digit",
+    timeZone: "America/Argentina/Buenos_Aires",
+    year: "numeric",
+  }).formatToParts(date);
+  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+
+  return `${values.year}-${values.month}-${values.day}`;
+}
+
+function sortMatchesByTime(matches: Match[]) {
+  return [...matches].sort((a, b) => {
+    const timeA = a.time || "99:99";
+    const timeB = b.time || "99:99";
+    return timeA.localeCompare(timeB) || a.id - b.id;
+  });
+}
+
+function sortMatchesBySchedule(matches: Match[]) {
+  return [...matches].sort((a, b) => {
+    const timeA = a.time || "99:99";
+    const timeB = b.time || "99:99";
+    return (
+      a.date.localeCompare(b.date) ||
+      timeA.localeCompare(timeB) ||
+      a.id - b.id
+    );
+  });
 }
 
 export function isArgentinaMatch(match: Match) {
@@ -62,6 +100,10 @@ export function formatMatchDate(date: string) {
 
 export function formatShortMatchDate(date: string) {
   return cleanText(shortDateFormatter.format(new Date(`${date}T12:00:00Z`)));
+}
+
+export function formatHeroMatchDate(date: string) {
+  return cleanText(heroDateFormatter.format(new Date(`${date}T12:00:00Z`)));
 }
 
 export function formatMatchTime(time: string) {
@@ -79,10 +121,33 @@ export function groupMatchesByDate(matches: Match[]): MatchDay[] {
     .map(([date, dayMatches]) => ({
       date,
       label: formatMatchDate(date),
-      matches: dayMatches.sort((a, b) => {
-        const timeA = a.time || "99:99";
-        const timeB = b.time || "99:99";
-        return timeA.localeCompare(timeB);
-      }),
+      matches: sortMatchesByTime(dayMatches),
     }));
+}
+
+export function getMatchesForDate(matches: Match[], date = getMatchDateKey()) {
+  return sortMatchesByTime(matches.filter((match) => match.date === date));
+}
+
+export function getCurrentOrNextMatchDay(matches: Match[], date = getMatchDateKey()) {
+  const matchDays = groupMatchesByDate(matches);
+  const currentDay = matchDays.find((day) => day.date === date);
+
+  if (currentDay) {
+    return currentDay;
+  }
+
+  return (
+    matchDays.find((day) => day.date > date) ?? matchDays[matchDays.length - 1]
+  );
+}
+
+export function getNextArgentinaMatch(matches: Match[], date = getMatchDateKey()) {
+  return sortMatchesBySchedule(matches.filter(isArgentinaMatch)).find(
+    (match) => match.date >= date,
+  );
+}
+
+export function getArgentinaGroup(matches: Match[]) {
+  return cleanText(matches.find(isArgentinaMatch)?.group ?? "A confirmar");
 }

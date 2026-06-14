@@ -6,7 +6,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Providers } from "./providers";
 import { EnviarHistoriaSection } from "@/components/EnviarHistoriaSection";
-import MundialTopBanner from "./mundial-2026/components/MundialTopBanner"
+import MundialBannerWrapper from "@/components/MundialBannerWrapper";
 const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://diario.jujuyconecta.com/";
 
@@ -207,7 +207,7 @@ export default function RootLayout({
 
         <Providers>
           <Header />
-          <MundialTopBanner />
+          <MundialBannerWrapper />
        
 
           <main className="relative z-10">{children}</main>
