@@ -1,8 +1,8 @@
-import { matches } from "./data/matches";
 import FixtureArgentina from "./components/FixtureArgentina";
-import FixtureDaySection from "./components/FixtureDaySection";
+import FixtureDateSelector from "./components/FixtureDateSelector";
 import FixtureHero from "./components/FixtureHero";
 import { groupMatchesByDate, isArgentinaMatch } from "./components/fixture-utils";
+import { matches } from "./data/matches";
 
 export default function FixturePage() {
   const totalGroups = new Set(
@@ -26,19 +26,15 @@ export default function FixturePage() {
               Calendario completo
             </p>
             <h2 className="text-3xl font-black tracking-tight text-white sm:text-4xl">
-              Todos los partidos, agrupados por fecha
+              Explor&aacute; el fixture por fecha
             </h2>
             <p className="mt-3 text-sm leading-6 text-zinc-400 sm:text-base">
-              La agenda se ordena automáticamente por día para seguir la fase de
-              grupos y el cuadro final sin perder detalle.
+              Seleccion&aacute; una jornada para ver solo los partidos de ese d&iacute;a y
+              moverte por el calendario sin recorrer una lista interminable.
             </p>
           </div>
 
-          <div className="space-y-10">
-            {matchDays.map((day) => (
-              <FixtureDaySection key={day.date} day={day} />
-            ))}
-          </div>
+          <FixtureDateSelector days={matchDays} />
         </section>
       </div>
     </main>

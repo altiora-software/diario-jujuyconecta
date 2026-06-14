@@ -39,6 +39,12 @@ const dateFormatter = new Intl.DateTimeFormat("es-AR", {
   timeZone: "UTC",
 });
 
+const shortDateFormatter = new Intl.DateTimeFormat("es-AR", {
+  day: "numeric",
+  month: "short",
+  timeZone: "UTC",
+});
+
 export function cleanText(value: string) {
   return Object.entries(mojibakeMap).reduce(
     (text, [broken, fixed]) => text.replaceAll(broken, fixed),
@@ -52,6 +58,10 @@ export function isArgentinaMatch(match: Match) {
 
 export function formatMatchDate(date: string) {
   return dateFormatter.format(new Date(`${date}T12:00:00Z`));
+}
+
+export function formatShortMatchDate(date: string) {
+  return cleanText(shortDateFormatter.format(new Date(`${date}T12:00:00Z`)));
 }
 
 export function formatMatchTime(time: string) {
