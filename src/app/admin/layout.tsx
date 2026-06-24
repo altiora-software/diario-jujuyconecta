@@ -1,3 +1,7 @@
+import type { ReactNode } from "react"
+
+import AdminLayout from "@/components/admin/AdminLayout"
+
 export const metadata = {
   title: "JUJUY CONECTA",
   description: "Plataforma digital de Jujuy",
@@ -6,13 +10,7 @@ export const metadata = {
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: ReactNode
 }) {
-  return (
-    <html lang="es-AR" suppressHydrationWarning>
-      <body>
-        {children}
-      </body>
-    </html>
-  )
+  return <AdminLayout>{children}</AdminLayout>
 }
