@@ -12,23 +12,36 @@ import {
 } from "./fixture-utils";
 import FixtureHeroActions from "./FixtureHeroActions";
 import FixtureHeroCarousel from "./FixtureHeroCarousel";
+import { getFlagUrl } from "../data/team-flags";
 
 type FixtureHeroProps = {
-  argentinaGroup: string;
   featuredDay: MatchDay;
   nextArgentinaMatch?: Match;
 };
 
 export default function FixtureHero({
-  argentinaGroup,
   featuredDay,
   nextArgentinaMatch,
 }: FixtureHeroProps) {
   const argentinaDate = nextArgentinaMatch
     ? `${formatHeroMatchDate(nextArgentinaMatch.date)} - ${formatMatchTime(
-        nextArgentinaMatch.time,
-      )}`
+      nextArgentinaMatch.time,
+    )}`
     : "A confirmar";
+
+  const currentStage = featuredDay.matches[0]?.group ?? "Mundial 2026";
+
+  const argentinaMatchLabel = nextArgentinaMatch
+    ? `${nextArgentinaMatch.homeTeam} vs ${nextArgentinaMatch.awayTeam}`
+    : "A confirmar";
+
+  const homeFlag = nextArgentinaMatch
+    ? getFlagUrl(nextArgentinaMatch.homeTeam)
+    : null;
+
+  const awayFlag = nextArgentinaMatch
+    ? getFlagUrl(nextArgentinaMatch.awayTeam)
+    : null;
 
   return (
     <section className="relative overflow-hidden bg-slate-950 text-white">
@@ -53,28 +66,59 @@ export default function FixtureHero({
 
             <FixtureHeroActions />
           </div>
-{/* CARD DERECHA  */}
+          {/* CARD DERECHA  */}
           <Card className="border-emerald-400/20 bg-slatz-900/80 text-white shadow-2xl shadow-emerald-950/30 backdrop-blur">
             <CardContent className="p-6 sm:p-8">
-              <div className="mb-8 flex h-16 w-16 items-center justify-center rounded-xl border border-emerald-400/25 bg-emerald-500/10">
-                <Trophy className="h-9 w-9 text-emerald-300" />
+              <div className="mb-8 flex items-center justify-between">
+                <div className="flex h-16 w-16 items-center justify-center rounded-xl border border-emerald-400/25 bg-emerald-500/10">
+                  <Trophy className="h-9 w-9 text-emerald-300" />
+                </div>
+
+                {nextArgentinaMatch && (
+                  <div className="flex items-center gap-3">
+                    {homeFlag && (
+                      <img
+                        src={homeFlag}
+                        alt={nextArgentinaMatch.homeTeam}
+                        className="h-8 w-11 rounded border border-white/20 object-cover"
+                      />
+                    )}
+
+                    <span className="text-sm font-black text-slate-400">VS</span>
+
+                    {awayFlag && (
+                      <img
+                        src={awayFlag}
+                        alt={nextArgentinaMatch.awayTeam}
+                        className="h-8 w-11 rounded border border-white/20 object-cover"
+                      />
+                    )}
+                  </div>
+                )}
               </div>
 
               <div className="grid gap-4">
-                {/* HOY SE JUEGAN  */}
                 <StatRow
-                  label="Hoy se juegan"
-                  value={`${featuredDay.matches.length} partidos`}
+                  label="Fase actual"
+                  value={currentStage}
                 />
-                {/* PROX DE ARG  */}        
-                <StatRow label={<>Pr&oacute;ximo Argentina</>} value={argentinaDate} />
-                {/* GEUPO  */}
-                {/* <StatRow label="Grupo" value={argentinaGroup} /> */}
+
+                <StatRow
+                  label="Próximo partido"
+                  value={argentinaDate}
+                />
+
+                <StatRow
+                  label="Argentina"
+                  value={argentinaMatchLabel}
+                />
+
                 <div className="rounded-md border border-cyan-400/20 bg-cyan-400/10 p-4">
                   <div className="flex items-center gap-3 text-cyan-100">
                     <CalendarDays className="h-5 w-5 text-cyan-300" />
+
                     <span className="text-sm font-bold uppercase tracking-[0.16em]">
-                      Calendario oficial
+                      Cobertura actualizada
                     </span>
                   </div>
                 </div>
@@ -89,13 +133,20 @@ export default function FixtureHero({
   );
 }
 
-function StatRow({ label, value }: { label: ReactNode; value: string }) {
+function StatRow({
+  label,
+  value,
+}: {
+  label: ReactNode;
+  value: string;
+}) {
   return (
-    <div className="flex items-center justify-between gap-4 border-b border-slate-800 pb-4">
+    <div className="flex items-start justify-between gap-5 border-b border-slate-800 pb-4">
       <span className="text-sm font-medium uppercase tracking-[0.18em] text-slate-400">
         {label}
       </span>
-      <span className="text-right text-xl font-bold text-emerald-300 sm:text-2xl">
+
+      <span className="max-w-[60%] text-right text-lg font-bold leading-tight text-emerald-300 sm:text-xl">
         {value}
       </span>
     </div>

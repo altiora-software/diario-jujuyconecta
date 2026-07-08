@@ -37,8 +37,8 @@ function HomeHeroSkeleton() {
 }
 
 export function HomeHero() {
-  const [principal, setPrincipal] = useState<Noticia | null>(null);
-  const [secundarias, setSecundarias] = useState<Noticia[]>([]);
+  const [noticias, setNoticias] = useState<Noticia[]>([]);
+  const [activeIndex, setActiveIndex] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -59,8 +59,8 @@ export function HomeHero() {
 
         if (!cancelled) {
           const rows = data as unknown as Noticia[];
-          setPrincipal(rows[0]);
-          setSecundarias(rows.slice(1));
+          setNoticias(rows);
+          setActiveIndex(0);
         }
       } catch (e) {
         console.error("[HomeHero] error:", e);
@@ -73,6 +73,19 @@ export function HomeHero() {
   }, []);
 
   // --- CAMBIO CLAVE: Si está cargando, mostramos el Skeleton ---
+  useEffect(() => {
+    if (noticias.length <= 1) return;
+
+    const intervalId = window.setInterval(() => {
+      setActiveIndex((currentIndex) => (currentIndex + 1) % noticias.length);
+    }, 6000);
+
+    return () => window.clearInterval(intervalId);
+  }, [noticias.length]);
+
+  const principal = noticias[activeIndex] ?? null;
+  const secundarias = noticias.filter((_, index) => index !== activeIndex);
+
   if (loading || !principal) return <HomeHeroSkeleton />;
 
   return (

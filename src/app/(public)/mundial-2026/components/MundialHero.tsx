@@ -15,18 +15,19 @@ export default function MundialHero() {
           </Badge>
 
           <h1 className="text-4xl font-black leading-tight tracking-tight text-white sm:text-5xl md:text-6xl">
-            Toda la cobertura del Mundial 2026
+            Sigue toda la acción de la Copa Mundial
           </h1>
 
           <p className="mt-5 max-w-2xl text-base leading-7 text-slate-300 sm:text-lg">
-            Fixture, grupos, resultados, estadísticas y noticias actualizadas
-            del torneo.
+            Cobertura especial con fixture actualizado, llaves, noticias y toda
+            la información de la recta final del Mundial 2026.
           </p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Button className="bg-emerald-500 text-slate-950 hover:bg-emerald-400">
-              Ver partidos de hoy
+              Ver partidos
             </Button>
+
             <Button
               variant="outline"
               className="border-emerald-400/40 bg-transparent text-emerald-100 hover:bg-emerald-500/10 hover:text-white"
@@ -44,9 +45,9 @@ export default function MundialHero() {
 
             <div className="grid gap-4">
               {[
-                ["48", "Selecciones"],
-                ["104", "Partidos"],
-                ["3", "Países"],
+                ["Cuartos", "Fase actual"],
+                ["4", "Partidos por jugar"],
+                ["19 Jul", "Gran final"],
               ].map(([value, label]) => (
                 <div
                   key={label}
@@ -55,6 +56,7 @@ export default function MundialHero() {
                   <span className="text-sm font-medium uppercase tracking-[0.18em] text-slate-400">
                     {label}
                   </span>
+
                   <span className="text-3xl font-black text-emerald-300">
                     {value}
                   </span>
