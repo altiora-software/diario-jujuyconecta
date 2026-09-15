@@ -215,13 +215,16 @@ export default function NoticiaEditorForm({
             className={inputStyles}
           />
         )}
-        {!onImageFileChange && values.imagen_url && (
+        {values.imagen_url && (
           <div className="overflow-hidden rounded-md border bg-muted/30">
             <img
               src={values.imagen_url}
               alt={values.titulo ? `Vista previa de ${values.titulo}` : "Vista previa de portada"}
               className="aspect-video w-full object-cover"
             />
+            {onImageFileChange && (
+              <p className="px-3 py-2 text-sm text-muted-foreground">Imagen actual</p>
+            )}
           </div>
         )}
       </div>

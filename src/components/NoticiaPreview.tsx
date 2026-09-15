@@ -3,7 +3,16 @@
 import { useEffect, useState } from "react";
 import { Eye, Clock } from "lucide-react";
 
-export default function NoticiaPreview({ data }: { data: any }) {
+type NoticiaPreviewData = {
+  titulo?: string;
+  resumen?: string;
+  contenido?: string;
+  categoriaNombre?: string | null;
+  imagen_url?: string | null;
+  imagenFile?: File | null;
+};
+
+export default function NoticiaPreview({ data }: { data: NoticiaPreviewData }) {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
 
   // Manejo de la URL de previsualización de imagen
@@ -14,9 +23,9 @@ export default function NoticiaPreview({ data }: { data: any }) {
       // Limpiamos la memoria cuando el componente se desmonta o la imagen cambia
       return () => URL.revokeObjectURL(objectUrl);
     } else {
-      setImageUrl(null);
+      setImageUrl(data.imagen_url ?? null);
     }
-  }, [data.imagenFile]);
+  }, [data.imagenFile, data.imagen_url]);
 
   return (
     <div className="space-y-4">
@@ -51,8 +60,10 @@ export default function NoticiaPreview({ data }: { data: any }) {
         {/* Contenido de la Nota */}
         <div className="p-6 md:p-8 space-y-4">
           <div className="flex items-center gap-3">
-             <div className="h-5 w-20 bg-primary/20 rounded-full border border-primary/30 flex items-center justify-center">
-                <span className="text-[9px] font-black text-primary uppercase tracking-tighter">Categoría</span>
+             <div className="flex h-5 min-w-20 items-center justify-center rounded-full border border-primary/30 bg-primary/20 px-2">
+                <span className="truncate text-[9px] font-black uppercase tracking-tighter text-primary">
+                  {data.categoriaNombre || "Categoría"}
+                </span>
              </div>
              <div className="flex items-center gap-1 text-slate-500 text-[9px] font-bold uppercase tracking-widest">
                 <Clock className="h-3 w-3" />
