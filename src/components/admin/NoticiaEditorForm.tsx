@@ -39,6 +39,8 @@ export type NoticiaEditorFormProps = {
   categorias: NoticiaEditorCategoria[]
   slugEditable?: boolean
   showDestacado?: boolean
+  imageFile?: File | null
+  onImageFileChange?: (file: File | null) => void
 }
 
 export default function NoticiaEditorForm({
@@ -51,6 +53,8 @@ export default function NoticiaEditorForm({
   categorias,
   slugEditable = true,
   showDestacado = false,
+  imageFile = null,
+  onImageFileChange,
 }: NoticiaEditorFormProps) {
   const [submitted, setSubmitted] = useState(false)
 
@@ -180,19 +184,38 @@ export default function NoticiaEditorForm({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="noticia-imagen-url" className={labelStyles}>
+        <Label
+          htmlFor={onImageFileChange ? "noticia-imagen-file" : "noticia-imagen-url"}
+          className={labelStyles}
+        >
           <ImagePlus className="h-3 w-3" /> Imagen de portada
         </Label>
-        <Input
-          id="noticia-imagen-url"
-          type="url"
-          value={values.imagen_url ?? ""}
-          onChange={(event) => updateField("imagen_url", event.target.value || null)}
-          disabled={loading}
-          placeholder="https://..."
-          className={inputStyles}
-        />
-        {values.imagen_url && (
+        {onImageFileChange ? (
+          <>
+            <Input
+              id="noticia-imagen-file"
+              type="file"
+              accept="image/*"
+              onChange={(event) => onImageFileChange(event.target.files?.[0] ?? null)}
+              disabled={loading}
+              className={`${inputStyles} cursor-pointer file:mr-4 file:rounded-full file:border-0 file:bg-primary file:px-4 file:py-1 file:text-xs file:font-black file:text-black hover:file:bg-primary/80`}
+            />
+            {imageFile && (
+              <p className="text-sm text-muted-foreground">Archivo: {imageFile.name}</p>
+            )}
+          </>
+        ) : (
+          <Input
+            id="noticia-imagen-url"
+            type="url"
+            value={values.imagen_url ?? ""}
+            onChange={(event) => updateField("imagen_url", event.target.value || null)}
+            disabled={loading}
+            placeholder="https://..."
+            className={inputStyles}
+          />
+        )}
+        {!onImageFileChange && values.imagen_url && (
           <div className="overflow-hidden rounded-md border bg-muted/30">
             <img
               src={values.imagen_url}
