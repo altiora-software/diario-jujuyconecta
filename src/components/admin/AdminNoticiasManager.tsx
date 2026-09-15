@@ -323,15 +323,25 @@ export default function AdminNoticiasManager() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        {n.estado === "publicado" && n.slug && (
+                        {n.estado === "publicado" && n.slug ? (
                           <Button
                             size="sm"
                             variant="ghost"
                             onClick={() => window.open(`/nota/${n.slug}`, "_blank")}
+                            title="Ver noticia publicada"
                           >
                             <Eye className="h-4 w-4" />
                           </Button>
-                        )}
+                        ) : n.estado === "borrador" ? (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => router.push(`/admin/noticias/${n.id}/preview`)}
+                            title="Vista previa privada"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                        ) : null}
                       </TableCell>
                     </TableRow>
                   ))}
