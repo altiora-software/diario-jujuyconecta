@@ -81,7 +81,9 @@ export default function AdminNoticiaPreviewPage() {
       setCanEdit(
         role === "admin" ||
           role === "editor" ||
-          (row.estado === "borrador" && row.owner_id === user.id)
+          (role === "colaborador" &&
+            row.estado === "borrador" &&
+            row.owner_id === user.id)
       )
 
       if (row.categoria_id !== null) {

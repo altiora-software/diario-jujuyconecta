@@ -162,13 +162,39 @@ export default function AdminNoticiasManager() {
   }, [filterEstado, searchTerm])
 
   const canEdit = (n: Noticia) =>
-    userId === n.owner_id || role === "admin" || role === "editor"
+    role === "admin" ||
+    role === "editor" ||
+    (role === "colaborador" && userId === n.owner_id && n.estado === "borrador")
 
   const canPublish = () => role === "admin" || role === "editor"
 
   const canDelete = (n: Noticia) => userId === n.owner_id || role === "admin"
 
   const publicar = async (id: number) => {
+    const { data: noticia, error: contenidoError } = await supabase
+      .from("noticias")
+      .select("contenido")
+      .eq("id", id)
+      .single()
+
+    if (contenidoError) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: contenidoError.message,
+      })
+      return
+    }
+
+    if (!noticia.contenido?.trim()) {
+      toast({
+        variant: "destructive",
+        title: "Contenido incompleto",
+        description: "Completá el contenido de la noticia antes de publicarla.",
+      })
+      return
+    }
+
     const { data, error } = await supabase
       .from("noticias")
       .update({

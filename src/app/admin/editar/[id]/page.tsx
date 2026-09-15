@@ -20,6 +20,8 @@ import type {
   NoticiaEditorValues,
 } from "@/types/noticia-editor"
 
+type Role = "admin" | "editor" | "colaborador" | null
+
 function normalizeSlug(value: string) {
   return value
     .toLowerCase()
@@ -67,8 +69,9 @@ export default function EditarNoticiaPage() {
         return
       }
 
-      const [noticiaResult, categoriasResult] = await Promise.all([
+      const [noticiaResult, profileResult, categoriasResult] = await Promise.all([
         supabase.from("noticias").select("*").eq("id", id).single(),
+        supabase.from("profiles").select("role").eq("id", user.id).single(),
         supabase
           .from("categorias")
           .select("id, nombre, slug")
@@ -85,6 +88,35 @@ export default function EditarNoticiaPage() {
         return
       }
 
+      if (profileResult.error) {
+        toast({
+          variant: "destructive",
+          title: "No se pudieron validar los permisos",
+          description: "Volvé a intentarlo o contactá a un administrador.",
+        })
+        router.replace("/admin/noticias")
+        return
+      }
+
+      const noticia = noticiaResult.data
+      const role = (profileResult.data?.role ?? null) as Role
+      const canEdit =
+        role === "admin" ||
+        role === "editor" ||
+        (role === "colaborador" &&
+          noticia.owner_id === user.id &&
+          noticia.estado === "borrador")
+
+      if (!canEdit) {
+        toast({
+          variant: "destructive",
+          title: "Permiso denegado",
+          description: "No tenés permiso para editar esta noticia.",
+        })
+        router.replace("/admin/noticias")
+        return
+      }
+
       if (categoriasResult.error) {
         toast({
           variant: "destructive",
@@ -94,8 +126,6 @@ export default function EditarNoticiaPage() {
         router.replace("/admin/noticias")
         return
       }
-
-      const noticia = noticiaResult.data
 
       setValues({
         titulo: noticia.titulo,
@@ -156,7 +186,7 @@ export default function EditarNoticiaPage() {
       imagenUrl = supabase.storage.from("media").getPublicUrl(path).data.publicUrl
     }
 
-    const { error } = await supabase
+    const { data: updated, error } = await supabase
       .from("noticias")
       .update({
         titulo: values.titulo,
@@ -168,6 +198,8 @@ export default function EditarNoticiaPage() {
         destacado: values.destacado,
       })
       .eq("id", id)
+      .select("id")
+      .maybeSingle()
 
     setSaving(false)
 
@@ -176,6 +208,15 @@ export default function EditarNoticiaPage() {
         variant: "destructive",
         title: "Error al guardar",
         description: error.message,
+      })
+      return
+    }
+
+    if (!updated) {
+      toast({
+        variant: "destructive",
+        title: "No se guardaron los cambios",
+        description: "La noticia no existe o ya no tenés permiso para editarla.",
       })
       return
     }
