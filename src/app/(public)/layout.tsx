@@ -5,7 +5,6 @@ import Script from "next/script";
 import { EnviarHistoriaSection } from "@/components/EnviarHistoriaSection";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
-import MundialBannerWrapper from "@/components/MundialBannerWrapper";
 
 const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://diario.jujuyconecta.com/";
@@ -176,7 +175,6 @@ export default function PublicLayout({
       </div>
 
       <Header />
-      <MundialBannerWrapper />
       <main className="relative z-10">{children}</main>
       <EnviarHistoriaSection />
       <Footer />

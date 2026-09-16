@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 type Categoria = { id: number; nombre: string; slug: string };
 const CURATED = ["provinciales", "actualidad", "deportes", "cultura", "economia"];
+const RETIRED_CATEGORY_SLUGS = new Set(["mundial-2026"]);
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -28,7 +29,11 @@ export default function Header() {
 
       if (error) console.error("Header load cats:", error);
       if (!mounted) return;
-      setCats((data ?? []) as Categoria[]);
+      setCats(
+        ((data ?? []) as Categoria[]).filter(
+          (categoria) => !RETIRED_CATEGORY_SLUGS.has(categoria.slug),
+        ),
+      );
       setLoadingCats(false);
     }
     load();
