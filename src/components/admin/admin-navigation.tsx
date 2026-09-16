@@ -36,12 +36,12 @@ export const adminNavItems: AdminNavItem[] = [
     icon: FilePlus2,
   },
   {
-    label: "Estadisticas",
+    label: "Estadísticas",
     href: "/admin/estadisticas",
     icon: BarChart3,
   },
   {
-    label: "Configuracion",
+    label: "Configuración",
     href: "/admin/configuracion",
     icon: Settings,
   },
@@ -76,7 +76,7 @@ export default function AdminNavigation({
   const pathname = usePathname()
 
   return (
-    <nav aria-label="Navegacion del panel" className={cn("space-y-1", className)}>
+    <nav aria-label="Navegación del panel" className={cn("space-y-1", className)}>
       {adminNavItems.map((item) => {
         const Icon = item.icon
         const active = isAdminNavItemActive(pathname, item.href)
@@ -94,7 +94,7 @@ export default function AdminNavigation({
           >
             <Icon className="h-4 w-4" aria-hidden="true" />
             <span>{item.label}</span>
-            {active ? <span className="sr-only"> (seccion actual)</span> : null}
+            {active ? <span className="sr-only"> (sección actual)</span> : null}
           </Link>
         )
       })}

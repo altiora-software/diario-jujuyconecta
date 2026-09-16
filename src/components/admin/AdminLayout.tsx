@@ -160,9 +160,13 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   }
 
   return (
-    <section className="min-h-screen bg-muted/40">
+    <section className="min-h-screen bg-secondary">
       <div className="flex min-h-screen">
-        <AdminSidebar />
+        <AdminSidebar
+          identity={identity}
+          signingOut={signingOut}
+          onSignOut={handleSignOut}
+        />
         <div className="flex min-w-0 flex-1 flex-col">
           <AdminHeader
             identity={identity}
