@@ -4,6 +4,7 @@ import Link from "next/link"
 import { ExternalLink, Loader2, LogOut, Newspaper } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
+import AdminMobileNavigation from "./AdminMobileNavigation"
 
 export type AdminIdentity = {
   displayName: string
@@ -25,15 +26,24 @@ export default function AdminHeader({
   return (
     <header className="sticky top-0 z-30 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
       <div className="flex h-16 items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
-        <div className="min-w-0">
-          <div className="flex items-center gap-2 text-xs font-medium uppercase text-muted-foreground">
-            <Newspaper className="h-4 w-4" aria-hidden="true" />
-            Admin
+        <div className="flex min-w-0 items-center gap-3">
+          <AdminMobileNavigation
+            identity={identity}
+            signingOut={signingOut}
+            onSignOut={onSignOut}
+          />
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 text-xs font-medium uppercase text-muted-foreground">
+              <Newspaper className="hidden h-4 w-4 sm:block" aria-hidden="true" />
+              Admin
+            </div>
+            <h1 className="truncate text-base font-semibold sm:text-lg">
+              Dashboard editorial
+            </h1>
           </div>
-          <h1 className="truncate text-lg font-semibold">Dashboard editorial</h1>
         </div>
 
-        <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+        <div className="hidden min-w-0 items-center gap-2 sm:gap-3 lg:flex">
           <div className="min-w-0 text-right leading-tight">
             {identity ? (
               <>
