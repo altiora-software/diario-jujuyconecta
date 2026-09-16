@@ -6,7 +6,6 @@ import { toast as sonner } from "sonner"
 
 import NoticiaEditorForm from "@/components/admin/NoticiaEditorForm"
 import NoticiaPreview from "@/components/NoticiaPreview"
-import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
@@ -21,8 +20,6 @@ import type {
   NoticiaEditorValues,
 } from "@/types/noticia-editor"
 
-type Role = "admin" | "editor" | "colaborador" | null
-
 function toSlug(value: string) {
   return value
     .toLowerCase()
@@ -36,8 +33,6 @@ export default function AdminNuevaNoticiaEditor() {
   const router = useRouter()
   const { toast } = useToast()
 
-  const [userEmail, setUserEmail] = useState<string | null>(null)
-  const [role, setRole] = useState<Role>(null)
   const [values, setValues] = useState<NoticiaEditorValues>({
     titulo: "",
     resumen: "",
@@ -61,16 +56,6 @@ export default function AdminNuevaNoticiaEditor() {
         router.replace("/login")
         return
       }
-
-      setUserEmail(user.email ?? null)
-
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("role")
-        .eq("id", user.id)
-        .single()
-
-      setRole((profile?.role ?? null) as Role)
 
       const { data: categoriasData, error: categoriasError } = await supabase
         .from("categorias")
@@ -164,22 +149,8 @@ export default function AdminNuevaNoticiaEditor() {
     setImagenFile(null)
   }
 
-  const displayName = userEmail?.split("@")[0] ?? "Usuario"
-
   return (
     <div className="px-4 py-8 sm:px-6 lg:px-8">
-      <div className="mb-8 flex items-center justify-between border-b pb-6">
-        <div>
-          <h2 className="text-3xl font-bold">
-            Hola <span className="text-primary">{displayName}</span>
-          </h2>
-          <p className="text-muted-foreground">Rol: {role ?? "..."}</p>
-        </div>
-        <Button variant="destructive" onClick={() => supabase.auth.signOut()}>
-          Cerrar sesion
-        </Button>
-      </div>
-
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
         <Card>
           <CardHeader>
