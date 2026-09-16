@@ -42,7 +42,10 @@ export default function AdminSidebar({
         </Link>
       </div>
 
-      <AdminNavigation className="min-h-0 flex-1 overflow-y-auto px-3 py-5" />
+      <AdminNavigation
+        role={identity?.role}
+        className="min-h-0 flex-1 overflow-y-auto px-3 py-5"
+      />
 
       <div className="shrink-0 space-y-4 border-t p-4">
         {identity ? (

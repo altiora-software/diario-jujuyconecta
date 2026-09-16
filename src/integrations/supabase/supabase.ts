@@ -338,6 +338,13 @@ export type Database = {
       }
     }
     Functions: {
+      admin_set_user_role: {
+        Args: {
+          p_role: Database["public"]["Enums"]["user_role"]
+          p_user_id: string
+        }
+        Returns: undefined
+      }
       promote_user: {
         Args: {
           p_email: string
