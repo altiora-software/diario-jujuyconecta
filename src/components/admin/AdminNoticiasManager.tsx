@@ -47,6 +47,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 import { useToast } from "@/hooks/use-toast"
 import { supabase } from "@/integrations/supabase/client"
 
@@ -59,6 +65,58 @@ type Noticia = {
   fecha_publicacion: string | null
   slug: string
   owner_id: string | null
+  origen: string | null
+  url_origen: string | null
+  profile: {
+    full_name: string | null
+  } | null
+}
+
+type CreatorInfo = {
+  name: string
+  indicator?: "Bot" | "Automático histórico"
+  url?: string | null
+}
+
+const AUTOMATED_ORIGINS: Record<
+  string,
+  Pick<CreatorInfo, "name" | "indicator">
+> = {
+  robot_criterio24: { name: "Criterio24", indicator: "Bot" },
+  robot_jujuy_al_momento: { name: "Jujuy al Momento", indicator: "Bot" },
+  robot_prensa_jujuy: { name: "Prensa Jujuy", indicator: "Bot" },
+  robot_todo_jujuy: { name: "Todo Jujuy", indicator: "Bot" },
+  TodoJujuy: { name: "Todo Jujuy", indicator: "Automático histórico" },
+  "TodoJujuy Mundial": {
+    name: "Todo Jujuy Mundial",
+    indicator: "Automático histórico",
+  },
+}
+
+function getCreatorInfo(noticia: Noticia): CreatorInfo {
+  const origin = noticia.origen?.trim()
+  const fullName = noticia.profile?.full_name?.trim()
+
+  if (origin === "manual") {
+    if (fullName) return { name: fullName }
+    if (noticia.owner_id) return { name: "Usuario sin nombre" }
+    return { name: "Autor no identificado" }
+  }
+
+  if (origin) {
+    const knownOrigin = AUTOMATED_ORIGINS[origin]
+
+    return {
+      name: knownOrigin?.name ?? origin,
+      indicator: knownOrigin?.indicator,
+      url: noticia.url_origen,
+    }
+  }
+
+  if (fullName) return { name: fullName }
+  if (noticia.owner_id) return { name: "Usuario sin nombre" }
+
+  return { name: "Autor no identificado" }
 }
 
 export default function AdminNoticiasManager() {
@@ -114,9 +172,10 @@ export default function AdminNoticiasManager() {
 
     let query = supabase
       .from("noticias")
-      .select("id,titulo,estado,fecha_publicacion,slug,owner_id", {
-        count: "exact",
-      })
+      .select(
+        "id,titulo,estado,fecha_publicacion,slug,owner_id,origen,url_origen,profile:profiles!noticias_owner_id_fkey(full_name)",
+        { count: "exact" }
+      )
       .order("created_at", { ascending: false })
       .range(from, to)
 
@@ -144,7 +203,7 @@ export default function AdminNoticiasManager() {
       return
     }
 
-    setNoticias((data ?? []) as Noticia[])
+    setNoticias(data ?? [])
     setTotalPages(Math.max(1, Math.ceil((count ?? 0) / PAGE_SIZE)))
     setLoading(false)
   }
@@ -298,20 +357,68 @@ export default function AdminNoticiasManager() {
             </div>
           ) : (
             <>
-              <Table>
+              <TooltipProvider delayDuration={300}>
+                <Table className="min-w-[760px] table-fixed">
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Titulo</TableHead>
-                    <TableHead>Estado</TableHead>
-                    <TableHead className="hidden md:table-cell">Fecha</TableHead>
-                    <TableHead className="text-right">Acciones</TableHead>
-                    <TableHead />
+                    <TableHead className="w-[32%]">Titulo</TableHead>
+                    <TableHead className="w-[22%]">Creado por</TableHead>
+                    <TableHead className="w-[110px]">Estado</TableHead>
+                    <TableHead className="hidden w-[110px] md:table-cell">
+                      Fecha
+                    </TableHead>
+                    <TableHead className="w-[152px] text-right">Acciones</TableHead>
+                    <TableHead className="w-[52px]" />
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {noticias.map((n) => (
-                    <TableRow key={n.id} id={`noticia-${n.id}`}>
-                      <TableCell>{n.titulo}</TableCell>
+                  {noticias.map((n) => {
+                    const creator = getCreatorInfo(n)
+
+                    return (
+                      <TableRow key={n.id} id={`noticia-${n.id}`}>
+                      <TableCell className="max-w-0">
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span
+                              tabIndex={0}
+                              className="block w-full truncate rounded-sm font-medium outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                            >
+                              {n.titulo}
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent className="max-w-sm whitespace-normal">
+                            {n.titulo}
+                          </TooltipContent>
+                        </Tooltip>
+                      </TableCell>
+                      <TableCell className="max-w-0">
+                        <div className="flex min-w-0 flex-col items-start gap-1">
+                          {creator.url ? (
+                            <a
+                              href={creator.url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="block max-w-full truncate font-medium hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                              title={creator.name}
+                            >
+                              {creator.name}
+                            </a>
+                          ) : (
+                            <span
+                              className="block max-w-full truncate font-medium"
+                              title={creator.name}
+                            >
+                              {creator.name}
+                            </span>
+                          )}
+                          {creator.indicator ? (
+                            <Badge variant="outline" className="whitespace-nowrap text-[10px]">
+                              {creator.indicator}
+                            </Badge>
+                          ) : null}
+                        </div>
+                      </TableCell>
                       <TableCell>{getEstadoBadge(n.estado)}</TableCell>
                       <TableCell className="hidden md:table-cell">
                         {n.fecha_publicacion
@@ -369,10 +476,12 @@ export default function AdminNoticiasManager() {
                           </Button>
                         ) : null}
                       </TableCell>
-                    </TableRow>
-                  ))}
+                      </TableRow>
+                    )
+                  })}
                 </TableBody>
-              </Table>
+                </Table>
+              </TooltipProvider>
 
               <div className="flex items-center justify-between pt-4">
                 <Button
