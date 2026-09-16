@@ -17,6 +17,7 @@ type AdminNavItem = {
   label: string
   href: string
   icon: LucideIcon
+  adminOnly?: boolean
 }
 
 export const adminNavItems: AdminNavItem[] = [
@@ -44,6 +45,7 @@ export const adminNavItems: AdminNavItem[] = [
     label: "Configuración",
     href: "/admin/configuracion",
     icon: Settings,
+    adminOnly: true,
   },
 ]
 
@@ -67,17 +69,22 @@ export function isAdminNavItemActive(pathname: string, href: string) {
 type AdminNavigationProps = {
   className?: string
   onNavigate?: () => void
+  role?: string
 }
 
 export default function AdminNavigation({
   className,
   onNavigate,
+  role,
 }: AdminNavigationProps) {
   const pathname = usePathname()
+  const visibleItems = adminNavItems.filter(
+    (item) => !item.adminOnly || role === "admin"
+  )
 
   return (
     <nav aria-label="Navegación del panel" className={cn("space-y-1", className)}>
-      {adminNavItems.map((item) => {
+      {visibleItems.map((item) => {
         const Icon = item.icon
         const active = isAdminNavItemActive(pathname, item.href)
 
