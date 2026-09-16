@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import Image from "next/image"
 import Link from "next/link"
 import { ExternalLink, Loader2, LogOut, Menu } from "lucide-react"
 
@@ -52,7 +53,7 @@ export default function AdminMobileNavigation({
           variant="outline"
           size="icon"
           className="shrink-0 lg:hidden"
-          aria-label="Abrir navegacion del panel"
+          aria-label="Abrir navegación del panel"
         >
           <Menu aria-hidden="true" />
         </Button>
@@ -62,20 +63,26 @@ export default function AdminMobileNavigation({
         side="left"
         className="flex w-[min(20rem,85vw)] flex-col gap-0 p-0 lg:hidden"
       >
-        <SheetHeader className="border-b px-5 py-5 text-left">
+        <SheetHeader className="flex h-16 shrink-0 justify-center border-b px-5 py-0 text-left">
           <SheetTitle className="flex items-center gap-3 pr-8">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary text-sm text-primary-foreground">
-              JC
-            </span>
-            <span>
+            <Image
+              src="/jc.png"
+              alt=""
+              width={652}
+              height={644}
+              sizes="40px"
+              className="h-10 w-auto shrink-0 object-contain"
+              priority
+            />
+            <span className="min-w-0">
               <span className="block text-sm font-semibold">Jujuy Conecta</span>
               <span className="block text-xs font-normal text-muted-foreground">
-                Administracion
+                Administración
               </span>
             </span>
           </SheetTitle>
           <SheetDescription className="sr-only">
-            Navegacion principal del panel de administracion
+            Navegación principal del panel de administración
           </SheetDescription>
         </SheetHeader>
 
@@ -86,10 +93,15 @@ export default function AdminMobileNavigation({
         <div className="space-y-4 border-t p-4">
           {identity ? (
             <div className="min-w-0 px-1 leading-tight">
-              <p className="truncate text-sm font-medium" title={identity.email}>
+              <p className="truncate text-sm font-medium" title={identity.displayName}>
                 {identity.displayName}
               </p>
-              <p className="mt-1 truncate text-[11px] uppercase tracking-wide text-muted-foreground">
+              {identity.email !== identity.displayName ? (
+                <p className="mt-1 truncate text-xs text-muted-foreground" title={identity.email}>
+                  {identity.email}
+                </p>
+              ) : null}
+              <p className="mt-2 truncate text-[11px] uppercase tracking-wide text-muted-foreground">
                 {identity.role}
               </p>
             </div>
@@ -99,7 +111,7 @@ export default function AdminMobileNavigation({
             <Button asChild type="button" variant="outline" className="justify-start">
               <Link href="/" onClick={() => setOpen(false)}>
                 <ExternalLink aria-hidden="true" />
-                Sitio publico
+                Sitio público
               </Link>
             </Button>
             <Button
@@ -114,7 +126,7 @@ export default function AdminMobileNavigation({
               ) : (
                 <LogOut aria-hidden="true" />
               )}
-              {signingOut ? "Saliendo..." : "Cerrar sesion"}
+              {signingOut ? "Saliendo..." : "Cerrar sesión"}
             </Button>
           </div>
         </div>
