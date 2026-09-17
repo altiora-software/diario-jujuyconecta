@@ -52,7 +52,7 @@ export default function Footer() {
               </span>
             </Link>
             <p className="text-secondary text-sm leading-relaxed font-medium italic">
-              "El pulso de la provincia en tiempo real. Periodismo independiente con visión de futuro."
+              &quot;El pulso de la provincia en tiempo real. Periodismo independiente con visión de futuro.&quot;
             </p>
             <div className="flex gap-3">
               {socialLinks.map((social) => {

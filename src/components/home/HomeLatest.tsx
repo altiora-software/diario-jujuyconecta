@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/integrations/supabase/client";
 import { CategoryBadge } from "@/components/ui/CategoryBadge";
+import { getErrorMessage } from "@/lib/errors";
 
 
 type NoticiaLista = {
@@ -61,8 +62,8 @@ export default function HomeLatest({
         if (!data || cancelled) return;
 
         setRows(data as unknown as NoticiaLista[]);
-      } catch (e: any) {
-        if (!cancelled) setErr(e.message ?? "Error al cargar las últimas noticias");
+      } catch (error: unknown) {
+        if (!cancelled) setErr(getErrorMessage(error, "Error al cargar las últimas noticias"));
       } finally {
         if (!cancelled) setLoading(false);
       }

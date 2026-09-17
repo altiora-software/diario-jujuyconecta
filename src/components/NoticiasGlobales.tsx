@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { getErrorMessage } from "@/lib/errors";
+import type { ExternalNewsArticle, ExternalNewsResponse } from "@/types/external-news";
 const SUPABASE_ANON_KEY =
   process.env.VITE_SUPABASE_ANON_KEY ||
   process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
@@ -68,15 +70,15 @@ export default function NoticiasGlobales({
         const urlTop = `${NEWS_PROXY_URL}/top-headlines?${params.toString()}`;
         console.log("[NoticiasGlobales] Fetching from:", urlTop);
 
-        let articles: any[] = [];
+        let articles: ExternalNewsArticle[] = [];
 
         // ---- 1) Intento principal: top-headlines ----
         const resTop = await fetch(urlTop, { headers: buildNewsHeaders() });
-        const jsonTop = await resTop.json();
+        const jsonTop = (await resTop.json()) as ExternalNewsResponse;
         console.log("[NoticiasGlobales] Response:", jsonTop);
 
         if (resTop.ok && jsonTop.status === "ok" && (jsonTop.articles?.length ?? 0) > 0) {
-          articles = jsonTop.articles;
+          articles = jsonTop.articles ?? [];
         } else {
           // ---- 2) Fallback: everything (búsqueda libre) ----
           const p2 = new URLSearchParams();
@@ -89,7 +91,7 @@ export default function NoticiasGlobales({
           console.log("[NoticiasGlobales] Fallback to:", urlEv);
 
           const resEv = await fetch(urlEv, {headers: buildNewsHeaders()});
-          const jsonEv = await resEv.json();
+          const jsonEv = (await resEv.json()) as ExternalNewsResponse;
           console.log("[NoticiasGlobales] Fallback response:", jsonEv);
 
           if (!resEv.ok || jsonEv.status !== "ok") {
@@ -99,7 +101,7 @@ export default function NoticiasGlobales({
         }
 
         // ---- Mapear noticias ----
-        const mapped = (articles || []).map((a: any, i: number) => ({
+        const mapped = articles.map((a, i) => ({
           id: i,
           titulo: a.title || "Sin título",
           slug:
@@ -116,8 +118,8 @@ export default function NoticiasGlobales({
         }));
 
         if (!cancelled) setRows(mapped);
-      } catch (e: any) {
-        if (!cancelled) setErr(e.message ?? "Error inesperado");
+      } catch (error: unknown) {
+        if (!cancelled) setErr(getErrorMessage(error, "Error inesperado"));
       } finally {
         if (!cancelled) setLoading(false);
       }

@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, ArrowLeft, ShieldCheck } from "lucide-react";
+import type { CheckedState } from "@radix-ui/react-checkbox";
 
 import loginBg from "@/assets/login-bg.jpg";
 
@@ -125,7 +126,7 @@ export default function LoginPage() {
               <Checkbox
                 id="remember"
                 checked={remember}
-                onCheckedChange={(checked: any) =>
+                onCheckedChange={(checked: CheckedState) =>
                   setRemember(Boolean(checked))
                 }
                 className="border-white/20 data-[state=checked]:bg-primary data-[state=checked]:text-black"

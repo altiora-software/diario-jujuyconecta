@@ -7,6 +7,9 @@ import { ChevronLeft, Globe, Zap, AlertCircle } from "lucide-react";
 
 // Helpers para Supabase
 import { getCategoryBySlug, getNoticiasByCategoriaId } from "@/lib/newsQueries";
+import type { NoticiaDB } from "@/lib/newsQueries";
+import { getErrorMessage } from "@/lib/errors";
+import type { ExternalNewsArticle, ExternalNewsResponse } from "@/types/external-news";
 
 const SUPABASE_ANON_KEY =
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ??
@@ -34,14 +37,10 @@ type NoticiaExternal = {
   original_url?: string | null;
 };
 
-type NoticiaInternal = {
-  id: number | string;
-  titulo: string;
-  slug: string;
-  imagen_url?: string | null;
-  fecha_publicacion?: string | null;
-  created_at?: string | null;
-};
+type NoticiaInternal = Pick<
+  NoticiaDB,
+  "id" | "titulo" | "slug" | "imagen_url" | "fecha_publicacion" | "created_at"
+>;
 
 const slugifyTitle = (s: string) =>
   s
@@ -90,7 +89,7 @@ async function fetchNoticiasPorProxy(slug: string): Promise<{ noticias: NoticiaE
   if (!NEWS_PROXY_URL) return { noticias: [], error: "Falta configurar NEWS_PROXY_URL" };
   const normalized = slug.toLowerCase();
   const mappedCategory = slugToCategoryMap[normalized];
-  let articles: any[] = [];
+  let articles: ExternalNewsArticle[] = [];
 
   try {
     if (mappedCategory) {
@@ -101,9 +100,9 @@ async function fetchNoticiasPorProxy(slug: string): Promise<{ noticias: NoticiaE
       p1.set("country", "ar");
       const urlTop = `${NEWS_PROXY_URL}/top-headlines?${p1.toString()}`;
       const resTop = await fetch(urlTop, { headers: FUNCTION_HEADERS, next: { revalidate: 300 } });
-      const jsonTop = await resTop.json();
+      const jsonTop = (await resTop.json()) as ExternalNewsResponse;
       if (resTop.ok && jsonTop?.status === "ok" && (jsonTop.articles?.length ?? 0) > 0) {
-        articles = jsonTop.articles;
+        articles = jsonTop.articles ?? [];
       }
     }
     if (articles.length === 0) {
@@ -115,11 +114,11 @@ async function fetchNoticiasPorProxy(slug: string): Promise<{ noticias: NoticiaE
       p2.set("pageSize", "24");
       const urlEv = `${NEWS_PROXY_URL}/everything?${p2.toString()}`;
       const resEv = await fetch(urlEv, { headers: FUNCTION_HEADERS, next: { revalidate: 300 } });
-      const jsonEv = await resEv.json();
+      const jsonEv = (await resEv.json()) as ExternalNewsResponse;
       if (!resEv.ok || jsonEv?.status !== "ok") throw new Error(jsonEv?.message || `HTTP ${resEv.status}`);
       articles = jsonEv.articles || [];
     }
-    const mapped: NoticiaExternal[] = articles.map((a: any, i: number) => {
+    const mapped: NoticiaExternal[] = articles.map((a, i) => {
       const title = a.title || a.description || "Sin título";
       const publishedAt = a.publishedAt ?? null;
       const slugFromTitle = slugifyTitle(title) + (publishedAt ? "-" + new Date(publishedAt).getTime() : `-${i}`);
@@ -134,8 +133,8 @@ async function fetchNoticiasPorProxy(slug: string): Promise<{ noticias: NoticiaE
       };
     });
     return { noticias: mapped, error: null };
-  } catch (e: any) {
-    return { noticias: [], error: e?.message };
+  } catch (error: unknown) {
+    return { noticias: [], error: getErrorMessage(error, "Error al cargar noticias externas") };
   }
 }
 
@@ -146,7 +145,7 @@ async function fetchNoticiasInternas(slug: string): Promise<{ noticias: NoticiaI
     if (!catRes.data) return { noticias: [], error: null };
     const noticiasRes = await getNoticiasByCategoriaId(catRes.data.id, 24);
     if (noticiasRes.error) return { noticias: [], error: String(noticiasRes.error.message ?? noticiasRes.error) };
-    const rows = (noticiasRes.data ?? []) as any[];
+    const rows = noticiasRes.data ?? [];
     const mapped: NoticiaInternal[] = rows.map((r) => ({
       id: r.id,
       titulo: r.titulo,
@@ -156,15 +155,17 @@ async function fetchNoticiasInternas(slug: string): Promise<{ noticias: NoticiaI
       created_at: r.created_at ?? null,
     }));
     return { noticias: mapped, error: null };
-  } catch (e: any) {
-    return { noticias: [], error: e?.message };
+  } catch (error: unknown) {
+    return { noticias: [], error: getErrorMessage(error, "Error al cargar noticias internas") };
   }
 }
 
 /** * COMPONENTE DE TARJETA (Visual Only)
  */
-const NewsCard = ({ noticia, isExternal }: { noticia: any, isExternal: boolean }) => {
-  const url = isExternal ? noticia.original_url : `/nota/${noticia.slug}`;
+const NewsCard = ({ noticia, isExternal }: { noticia: NoticiaExternal | NoticiaInternal, isExternal: boolean }) => {
+  const originalUrl = "original_url" in noticia ? noticia.original_url : null;
+  const source = "source" in noticia ? noticia.source : null;
+  const url = isExternal && originalUrl ? originalUrl : `/nota/${noticia.slug}`;
   const target = isExternal ? "_blank" : "_self";
 
   return (
@@ -179,7 +180,7 @@ const NewsCard = ({ noticia, isExternal }: { noticia: any, isExternal: boolean }
         <div className="absolute top-4 right-4">
           <span className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter backdrop-blur-md border border-white/10 ${isExternal ? 'bg-blue-500/20 text-blue-400' : 'bg-primary/20 text-primary'}`}>
             {isExternal ? <Globe className="w-3 h-3" /> : <Zap className="w-3 h-3" />}
-            {isExternal ? (noticia.source || 'Global') : 'Exclusivo'}
+            {isExternal ? (source || 'Global') : 'Exclusivo'}
           </span>
         </div>
       </div>
@@ -188,7 +189,7 @@ const NewsCard = ({ noticia, isExternal }: { noticia: any, isExternal: boolean }
           {noticia.titulo}
         </h3>
         <time className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-          {new Date(noticia.fecha_publicacion || noticia.created_at || "").toLocaleDateString("es-AR", { day: 'numeric', month: 'long' })}
+          {new Date(noticia.fecha_publicacion || ("created_at" in noticia ? noticia.created_at : null) || "").toLocaleDateString("es-AR", { day: 'numeric', month: 'long' })}
         </time>
       </div>
     </Link>
@@ -201,7 +202,7 @@ export default async function SeccionPage({ params }: PageProps) {
   // 1. Intentar internas
   const internas = await fetchNoticiasInternas(slug);
   
-  let noticiasAMostrar = internas.noticias || [];
+  let noticiasAMostrar: Array<NoticiaInternal | NoticiaExternal> = internas.noticias || [];
   let isExternalFallback = false;
   let errorMsg = internas.error;
 
@@ -245,7 +246,7 @@ export default async function SeccionPage({ params }: PageProps) {
           <div className="xl:col-span-8">
             {noticiasAMostrar.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                {noticiasAMostrar.map((n: any) => (
+                {noticiasAMostrar.map((n) => (
                   <NewsCard key={n.id} noticia={n} isExternal={isExternalFallback} />
                 ))}
               </div>

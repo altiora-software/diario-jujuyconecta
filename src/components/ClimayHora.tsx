@@ -97,7 +97,7 @@ export default function ClimaYHora() {
           clearInterval(clockInterval);
           clearInterval(weatherInterval);
         };
-      } catch (err: any) {
+      } catch (err: unknown) {
         if (!cancelled) {
           console.error("ClimaYHora:", err);
           setError("No se pudo obtener el clima.");
