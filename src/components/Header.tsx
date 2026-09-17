@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { Search, Menu, X, ChevronDown, Rocket } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -64,7 +65,7 @@ export default function Header() {
           {/* Logo y Branding */}
           <Link href="/" className="flex items-center space-x-3 group">
             <div className="relative">
-               <img src="/jc.png" alt="Jujuy Conecta" className="h-12 w-12 transition-transform group-hover:scale-110 duration-300" />
+               <Image src="/jc.png" alt="Jujuy Conecta" width={48} height={48} className="h-12 w-12 transition-transform group-hover:scale-110 duration-300" />
                <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full -z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
             <div className="flex flex-col leading-none">
