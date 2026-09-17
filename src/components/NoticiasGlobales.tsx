@@ -1,17 +1,6 @@
 import { useEffect, useState } from "react";
 import { getErrorMessage } from "@/lib/errors";
 import type { ExternalNewsArticle, ExternalNewsResponse } from "@/types/external-news";
-const SUPABASE_ANON_KEY =
-  process.env.VITE_SUPABASE_ANON_KEY ||
-  process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-
-const FUNCTION_HEADERS = SUPABASE_ANON_KEY
-  ? {
-      apikey: SUPABASE_ANON_KEY,
-      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-    }
-  : {};
-
 
 type Noticia = {
   id: number;

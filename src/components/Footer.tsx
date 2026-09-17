@@ -1,6 +1,6 @@
 'use client';
 
-import { Facebook, Instagram, Youtube, MessageCircle, Mail, MapPin, Phone, ArrowUpRight } from "lucide-react";
+import { Facebook, Instagram, Youtube, MessageCircle, ArrowUpRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 

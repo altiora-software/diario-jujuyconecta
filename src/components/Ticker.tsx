@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Clock } from "lucide-react";
 
 const Ticker = ({ noticias }: { noticias: Array<{ id: number; titulo: string }> }) => {

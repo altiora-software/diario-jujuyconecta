@@ -3,7 +3,6 @@ import Link from "next/link";
 import { createClient } from "@supabase/supabase-js";
 import SocialSidebar from "@/components/SocialSidebar";
 import Ticker from "@/components/Ticker";
-import { Card, CardContent } from "@/components/ui/card";
 import type { Database } from "@/integrations/supabase/supabase";
 import RecentNewsList from "@/components/RecentNewsList";
 import MarketplaceBanner from "@/components/MarketplaceBanner";
