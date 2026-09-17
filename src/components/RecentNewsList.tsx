@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import type { Tables } from "@/integrations/supabase/supabase";
+import { getErrorMessage } from "@/lib/errors";
 
 type NotaResumida = {
   id: number;
@@ -13,6 +15,11 @@ type NotaResumida = {
   fecha_publicacion: string | null;
   created_at: string;
 };
+
+type NotaRow = Pick<
+  Tables<"noticias">,
+  "id" | "titulo" | "slug" | "imagen_url" | "fecha_publicacion" | "created_at"
+>;
 
 const MAX_NOTICIAS = 4;
 
@@ -83,15 +90,15 @@ const RecentNewsList = ({ categorySlug }: Props) => {
 
         if (error) throw error;
         if (!cancelled && data) setNoticias(mapNotas(data));
-      } catch (e: any) {
-        if (!cancelled) setError(e?.message ?? "Error al cargar noticias recientes");
+      } catch (error: unknown) {
+        if (!cancelled) setError(getErrorMessage(error, "Error al cargar noticias recientes"));
       } finally {
         if (!cancelled) setLoading(false);
       }
     }
 
-    function mapNotas(data: any[]) {
-      return data.map((n: any) => ({
+    function mapNotas(data: NotaRow[]): NotaResumida[] {
+      return data.map((n) => ({
         id: n.id,
         titulo: n.titulo,
         slug: n.slug,
