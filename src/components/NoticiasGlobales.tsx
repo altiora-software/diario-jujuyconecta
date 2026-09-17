@@ -1,17 +1,8 @@
 import { useEffect, useState } from "react";
 import { getErrorMessage } from "@/lib/errors";
 import type { ExternalNewsArticle, ExternalNewsResponse } from "@/types/external-news";
-const SUPABASE_ANON_KEY =
-  process.env.VITE_SUPABASE_ANON_KEY ||
-  process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
-const FUNCTION_HEADERS = SUPABASE_ANON_KEY
-  ? {
-      apikey: SUPABASE_ANON_KEY,
-      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-    }
-  : {};
-
+const NEWS_PROXY_URL = process.env.VITE_NEWS_PROXY_URL as string | undefined;
 
 type Noticia = {
   id: number;
@@ -43,9 +34,6 @@ export default function NoticiasGlobales({
   const [rows, setRows] = useState<Noticia[]>([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
-
-  // ✅ Usar la variable de entorno si existe
-  const NEWS_PROXY_URL = process.env.VITE_NEWS_PROXY_URL as string | undefined;
 
   useEffect(() => {
     let cancelled = false;

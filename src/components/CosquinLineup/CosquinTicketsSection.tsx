@@ -1,4 +1,6 @@
 'use client'
+import Image from "next/image";
+
 const cosquinTickets = [
     {
       id: "abono-general",
@@ -70,9 +72,11 @@ const cosquinTickets = [
             >
               <div className="relative aspect-[3/4] w-full bg-slate-100">
                 {/* Acá ponés tus imágenes recortadas del arte oficial */}
-                <img
+                <Image
                   src={ticket.imageSrc}
                   alt={ticket.title}
+                  fill
+                  sizes="(min-width: 1024px) 25vw, (min-width: 768px) 50vw, 100vw"
                   className="h-full w-full object-cover"
                   loading="lazy"
                 />

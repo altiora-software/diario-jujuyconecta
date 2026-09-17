@@ -34,7 +34,7 @@ export default function ClimaYHora() {
         const lon = -65.2995;
 
         const climaUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=America/Argentina/Jujuy`;
-        const [climaRes, timeRes] = await Promise.all([
+        const [climaRes] = await Promise.all([
           fetch(climaUrl),
           fetch("https://worldtimeapi.org/api/timezone/America/Argentina/Jujujy").catch(() => null), // fallback harmless
         ]);
@@ -86,7 +86,7 @@ export default function ClimaYHora() {
                 relativehumidity: undefined,
               });
             }
-          } catch (e) {
+          } catch {
             // noop
           }
         }, 600_000);
@@ -106,7 +106,7 @@ export default function ClimaYHora() {
       }
     }
 
-    const cleanupPromise = fetchData();
+    void fetchData();
 
     return () => {
       cancelled = true;

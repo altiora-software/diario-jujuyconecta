@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import {
   CheckCircle,
@@ -119,11 +119,12 @@ function getCreatorInfo(noticia: Noticia): CreatorInfo {
   return { name: "Autor no identificado" }
 }
 
+const PAGE_SIZE = 10
+
 export default function AdminNoticiasManager() {
   const router = useRouter()
   const { toast } = useToast()
 
-  const PAGE_SIZE = 10
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
 
@@ -162,7 +163,7 @@ export default function AdminNoticiasManager() {
 
   const userReady = !!userId && !!role
 
-  const fetchNoticias = async () => {
+  const fetchNoticias = useCallback(async () => {
     if (!userReady) return
 
     setLoading(true)
@@ -206,7 +207,7 @@ export default function AdminNoticiasManager() {
     setNoticias(data ?? [])
     setTotalPages(Math.max(1, Math.ceil((count ?? 0) / PAGE_SIZE)))
     setLoading(false)
-  }
+  }, [filterEstado, page, role, searchTerm, toast, userId, userReady])
 
   useEffect(() => {
     if (!userReady) {
@@ -214,7 +215,7 @@ export default function AdminNoticiasManager() {
       return
     }
     fetchNoticias()
-  }, [userReady, page, filterEstado, searchTerm])
+  }, [fetchNoticias, userReady])
 
   useEffect(() => {
     setPage(1)

@@ -6,7 +6,6 @@ import { Play, Pause, Volume2, Radio as RadioIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
-import type { Metadata } from "next";
 
 
 const RadioPage = () => {

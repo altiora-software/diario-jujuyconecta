@@ -1,7 +1,6 @@
 // src/app/nota/[slug]/page.tsx
 import { notFound } from "next/navigation";
-import type { Metadata, ResolvingMetadata } from "next";
-import Script from "next/script";
+import type { Metadata } from "next";
 import Image from "next/image";
 import { supabase } from "@/integrations/supabase/client";
 import RatingStars from "@/components/RatingStars";
@@ -47,7 +46,7 @@ async function getNotaBySlug(slug: string): Promise<Nota | null> {
 
 type RouteParams = { params: Promise<{ slug: string }> };
 
-export async function generateMetadata({ params }: RouteParams, parent: ResolvingMetadata): Promise<Metadata> {
+export async function generateMetadata({ params }: RouteParams): Promise<Metadata> {
   const { slug } = await params;
   const nota = await getNotaBySlug(slug);
   if (!nota) return { title: "Noticia no encontrada" };
