@@ -87,7 +87,10 @@ export default function AdminMobileNavigation({
         </SheetHeader>
 
         <div className="min-h-0 flex-1 overflow-y-auto px-3 py-5">
-          <AdminNavigation onNavigate={() => setOpen(false)} />
+          <AdminNavigation
+            role={identity?.role}
+            onNavigate={() => setOpen(false)}
+          />
         </div>
 
         <div className="space-y-4 border-t p-4">
