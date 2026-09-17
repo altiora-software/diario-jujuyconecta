@@ -136,7 +136,7 @@ export default async function NoticiaPage({ params }: RouteParams) {
                   Resumen
                 </div>
                 <p className="text-xl md:text-2xl text-slate-200 leading-relaxed font-medium italic">
-                  "{nota.resumen}"
+                  &quot;{nota.resumen}&quot;
                 </p>
               </div>
             )}

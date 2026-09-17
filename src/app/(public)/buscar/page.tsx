@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { supabase } from "@/integrations/supabase/client";
+import { getErrorMessage } from "@/lib/errors";
 
 type NotaBusqueda = {
   id: number;
@@ -67,9 +68,9 @@ function BuscarContent() {
         if (!cancelled) {
           setResultados((data as NotaBusqueda[]) ?? []);
         }
-      } catch (e: any) {
+      } catch (error: unknown) {
         if (!cancelled) {
-          setError(e?.message ?? "Error al buscar noticias");
+          setError(getErrorMessage(error, "Error al buscar noticias"));
           setResultados([]);
         }
       } finally {

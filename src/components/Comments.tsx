@@ -75,7 +75,7 @@ export default function Comments({ noticiaId }: Props) {
       setContenido("");
       setComentarios(prev => [data as Comentario, ...prev]);
       toast.success("Comentario publicado.");
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("handleSubmit unexpected error:", err);
       toast.error("Error al publicar comentario.");
     } finally {

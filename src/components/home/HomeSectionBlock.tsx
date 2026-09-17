@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/integrations/supabase/client";
 import { CategoryBadge } from "@/components/ui/CategoryBadge";
+import { getErrorMessage } from "@/lib/errors";
 
 type Categoria = {
   id: number;
@@ -69,8 +70,8 @@ export default function HomeSectionBlock({
         if (cancelled) return;
 
         setNoticias((rows ?? []) as Noticia[]);
-      } catch (e: any) {
-        if (!cancelled) setErr(e.message ?? "Error al cargar la sección");
+      } catch (error: unknown) {
+        if (!cancelled) setErr(getErrorMessage(error, "Error al cargar la sección"));
       } finally {
         if (!cancelled) setLoading(false);
       }

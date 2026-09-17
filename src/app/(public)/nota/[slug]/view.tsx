@@ -2,6 +2,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 
 export type Nota = {
   id: number;
@@ -33,12 +34,12 @@ export function NoticiaView({ nota, showBackLink = false }: NoticiaViewProps) {
   return (
     <article className="mx-auto w-full max-w-3xl">
       {showBackLink && (
-        <a
+        <Link
           href="/"
           className="inline-flex items-center gap-2 text-primary hover:underline mb-6"
         >
           ← Volver al inicio
-        </a>
+        </Link>
       )}
 
       <header className="mb-8">
