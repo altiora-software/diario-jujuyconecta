@@ -15,6 +15,9 @@ import {
 } from "@/components/ui/card"
 import { useToast } from "@/hooks/use-toast"
 import { supabase } from "@/integrations/supabase/client"
+import { replaceNoticiaBloques } from "@/lib/noticia-bloques"
+import { uploadNoticiaImage } from "@/lib/noticia-media"
+import type { NoticiaBloqueEditorItem } from "@/types/noticia-bloques"
 import type {
   NoticiaEditorCategoria,
   NoticiaEditorValues,
@@ -45,6 +48,9 @@ export default function AdminNuevaNoticiaEditor() {
   const [imagenFile, setImagenFile] = useState<File | null>(null)
   const [categorias, setCategorias] = useState<NoticiaEditorCategoria[]>([])
   const [saving, setSaving] = useState(false)
+  const [blockUploading, setBlockUploading] = useState(false)
+  const [bloques, setBloques] = useState<NoticiaBloqueEditorItem[]>([])
+  const [createdNoticiaId, setCreatedNoticiaId] = useState<number | null>(null)
 
   useEffect(() => {
     ;(async () => {
@@ -72,6 +78,15 @@ export default function AdminNuevaNoticiaEditor() {
   }, [router])
 
   const handleSubmit = async () => {
+    if (blockUploading) {
+      toast({
+        variant: "destructive",
+        title: "Hay imágenes subiendo",
+        description: "Esperá a que terminen antes de guardar.",
+      })
+      return
+    }
+
     setSaving(true)
 
     const { data: auth } = await supabase.auth.getUser()
@@ -85,30 +100,31 @@ export default function AdminNuevaNoticiaEditor() {
       return
     }
 
-    let imagenUrl: string | null = null
+    let imagenUrl = values.imagen_url
     if (imagenFile) {
-      const path = `noticias/${crypto.randomUUID()}-${imagenFile.name}`
-      const { error } = await supabase.storage.from("media").upload(path, imagenFile)
-
-      if (error) {
+      try {
+        imagenUrl = await uploadNoticiaImage(imagenFile)
+        setValues((current) => ({ ...current, imagen_url: imagenUrl }))
+        setImagenFile(null)
+      } catch (error) {
         toast({
           variant: "destructive",
           title: "Error al subir imagen",
-          description: error.message,
+          description:
+            error instanceof Error ? error.message : "No se pudo subir la portada.",
         })
         setSaving(false)
         return
       }
-
-      imagenUrl = supabase.storage.from("media").getPublicUrl(path).data.publicUrl
     }
 
     const finalSlug =
       values.slug.trim() || `${toSlug(values.titulo)}-${Date.now().toString(36)}`
 
-    const { data: inserted, error } = await supabase
-      .from("noticias")
-      .insert({
+    let noticiaId = createdNoticiaId
+
+    if (noticiaId === null) {
+      const { data: inserted, error } = await supabase.from("noticias").insert({
         titulo: values.titulo,
         slug: finalSlug,
         resumen: values.resumen,
@@ -118,24 +134,66 @@ export default function AdminNuevaNoticiaEditor() {
         owner_id: auth.user.id,
         imagen_url: imagenUrl,
       })
-      .select("id")
-      .single()
+        .select("id")
+        .single()
 
-    setSaving(false)
+      if (error || !inserted) {
+        toast({
+          variant: "destructive",
+          title: "Error al crear la noticia",
+          description: error?.message ?? "No se obtuvo el identificador de la noticia.",
+        })
+        setSaving(false)
+        return
+      }
 
-    if (error) {
-      toast({ variant: "destructive", title: "Error", description: error.message })
+      noticiaId = inserted.id
+      setCreatedNoticiaId(noticiaId)
+      setValues((current) => ({ ...current, slug: finalSlug }))
+    } else {
+      const { error } = await supabase
+        .from("noticias")
+        .update({
+          titulo: values.titulo,
+          slug: finalSlug,
+          resumen: values.resumen,
+          contenido: values.contenido,
+          categoria_id: Number(values.categoria_id),
+          imagen_url: imagenUrl,
+        })
+        .eq("id", noticiaId)
+
+      if (error) {
+        toast({
+          variant: "destructive",
+          title: "Error al actualizar el borrador",
+          description: error.message,
+        })
+        setSaving(false)
+        return
+      }
+    }
+
+    const bloquesResult = await replaceNoticiaBloques(noticiaId, bloques)
+    if (bloquesResult.error) {
+      toast({
+        variant: "destructive",
+        title: "La noticia se creó, pero los bloques no se guardaron",
+        description: bloquesResult.restored
+          ? `${bloquesResult.error} Podés corregirlos y volver a guardar este borrador.`
+          : `${bloquesResult.error} Tampoco se pudo restaurar el estado anterior; revisalo antes de continuar.`,
+      })
+      setSaving(false)
       return
     }
 
-    toast({ title: "Borrador creado", description: "La noticia se guardó como borrador." })
+    setSaving(false)
+    toast({ title: "Borrador creado", description: "La noticia y sus bloques se guardaron." })
 
-    if (inserted?.id) {
-      sonner.success("Borrador creado", {
-        description: "Ya esta disponible en Noticias",
-      })
-      router.push("/admin/noticias")
-    }
+    sonner.success("Borrador creado", {
+      description: "Ya está disponible en Noticias",
+    })
+    router.push("/admin/noticias")
 
     setValues({
       titulo: "",
@@ -147,6 +205,7 @@ export default function AdminNuevaNoticiaEditor() {
       destacado: false,
     })
     setImagenFile(null)
+    setBloques([])
   }
 
   return (
@@ -164,12 +223,15 @@ export default function AdminNuevaNoticiaEditor() {
               onChange={setValues}
               onSubmit={handleSubmit}
               onCancel={() => router.push("/admin/noticias")}
-              loading={saving}
+              loading={saving || blockUploading}
               categorias={categorias}
               slugEditable
               showDestacado={false}
               imageFile={imagenFile}
               onImageFileChange={setImagenFile}
+              bloques={bloques}
+              onBloquesChange={setBloques}
+              onBlockUploadingChange={setBlockUploading}
             />
           </CardContent>
         </Card>
@@ -180,7 +242,7 @@ export default function AdminNuevaNoticiaEditor() {
               <CardTitle>Vista previa</CardTitle>
             </CardHeader>
             <CardContent>
-              <NoticiaPreview data={{ ...values, imagenFile }} />
+              <NoticiaPreview data={{ ...values, imagenFile, bloques }} />
             </CardContent>
           </Card>
         </div>

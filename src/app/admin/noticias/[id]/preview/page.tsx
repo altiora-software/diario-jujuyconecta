@@ -5,11 +5,14 @@ import { useParams, useRouter } from "next/navigation"
 import { ArrowLeft, CalendarDays, Loader2, Pencil, Tag } from "lucide-react"
 
 import ArticleBody from "@/components/ArticleBody"
+import NoticiaBloquesPreview from "@/components/admin/NoticiaBloquesPreview"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { useToast } from "@/hooks/use-toast"
 import { supabase } from "@/integrations/supabase/client"
+import { loadNoticiaBloques } from "@/lib/noticia-bloques"
+import type { NoticiaBloqueEditorItem } from "@/types/noticia-bloques"
 
 type Role = "admin" | "editor" | "colaborador" | null
 
@@ -36,6 +39,7 @@ export default function AdminNoticiaPreviewPage() {
   const [noticia, setNoticia] = useState<Noticia | null>(null)
   const [categoriaNombre, setCategoriaNombre] = useState<string | null>(null)
   const [canEdit, setCanEdit] = useState(false)
+  const [bloques, setBloques] = useState<NoticiaBloqueEditorItem[]>([])
 
   useEffect(() => {
     if (!id) {
@@ -53,7 +57,7 @@ export default function AdminNoticiaPreviewPage() {
         return
       }
 
-      const [noticiaResult, profileResult] = await Promise.all([
+      const [noticiaResult, profileResult, bloquesResult] = await Promise.all([
         supabase
           .from("noticias")
           .select(
@@ -62,6 +66,7 @@ export default function AdminNoticiaPreviewPage() {
           .eq("id", id)
           .single(),
         supabase.from("profiles").select("role").eq("id", user.id).single(),
+        loadNoticiaBloques(id),
       ])
 
       if (noticiaResult.error || !noticiaResult.data) {
@@ -77,7 +82,18 @@ export default function AdminNoticiaPreviewPage() {
       const row = noticiaResult.data as Noticia
       const role = (profileResult.data?.role ?? null) as Role
 
+      if (bloquesResult.error !== null) {
+        toast({
+          variant: "destructive",
+          title: "No se pudieron cargar los bloques",
+          description: bloquesResult.error,
+        })
+        router.replace("/admin/noticias")
+        return
+      }
+
       setNoticia(row)
+      setBloques(bloquesResult.data)
       setCanEdit(
         role === "admin" ||
           role === "editor" ||
@@ -180,7 +196,9 @@ export default function AdminNoticiaPreviewPage() {
               )}
             </header>
 
-            {noticia.contenido ? (
+            {bloques.length > 0 ? (
+              <NoticiaBloquesPreview bloques={bloques} />
+            ) : noticia.contenido ? (
               <ArticleBody content={noticia.contenido} />
             ) : (
               <p className="text-muted-foreground">Esta noticia todavía no tiene contenido.</p>

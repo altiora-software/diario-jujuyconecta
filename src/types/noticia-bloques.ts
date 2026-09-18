@@ -72,6 +72,11 @@ export type NoticiaBloqueInput = {
   }
 }[NoticiaBloqueTipo]
 
+export type NoticiaBloqueEditorItem = NoticiaBloqueInput & {
+  id?: number
+  editorKey: string
+}
+
 export type NoticiaBloqueValidationResult =
   | { success: true; data: NoticiaBloqueInput }
   | { success: false; error: string }

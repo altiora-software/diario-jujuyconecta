@@ -23,6 +23,8 @@ import {
 } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
+import NoticiaBloquesEditor from "@/components/admin/NoticiaBloquesEditor"
+import type { NoticiaBloqueEditorItem } from "@/types/noticia-bloques"
 import type {
   NoticiaEditorCategoria,
   NoticiaEditorMode,
@@ -41,6 +43,9 @@ export type NoticiaEditorFormProps = {
   showDestacado?: boolean
   imageFile?: File | null
   onImageFileChange?: (file: File | null) => void
+  bloques: NoticiaBloqueEditorItem[]
+  onBloquesChange: (bloques: NoticiaBloqueEditorItem[]) => void
+  onBlockUploadingChange?: (uploading: boolean) => void
 }
 
 export default function NoticiaEditorForm({
@@ -55,6 +60,9 @@ export default function NoticiaEditorForm({
   showDestacado = false,
   imageFile = null,
   onImageFileChange,
+  bloques,
+  onBloquesChange,
+  onBlockUploadingChange,
 }: NoticiaEditorFormProps) {
   const [submitted, setSubmitted] = useState(false)
 
@@ -170,8 +178,11 @@ export default function NoticiaEditorForm({
 
       <div className="space-y-2">
         <Label htmlFor="noticia-contenido" className={labelStyles}>
-          <AlignLeft className="h-3 w-3" /> Cuerpo de la noticia
+          <AlignLeft className="h-3 w-3" /> Contenido clásico
         </Label>
+        <p className="text-xs text-muted-foreground">
+          Se conserva como fallback para noticias antiguas y para el renderer público actual.
+        </p>
         <Textarea
           id="noticia-contenido"
           rows={8}
@@ -182,6 +193,13 @@ export default function NoticiaEditorForm({
           className={`${inputStyles} resize-none leading-relaxed`}
         />
       </div>
+
+      <NoticiaBloquesEditor
+        bloques={bloques}
+        onChange={onBloquesChange}
+        disabled={loading}
+        onUploadingChange={onBlockUploadingChange}
+      />
 
       <div className="space-y-2">
         <Label

@@ -15,6 +15,12 @@ import {
 } from "@/components/ui/card"
 import { useToast } from "@/hooks/use-toast"
 import { supabase } from "@/integrations/supabase/client"
+import {
+  loadNoticiaBloques,
+  replaceNoticiaBloques,
+} from "@/lib/noticia-bloques"
+import { uploadNoticiaImage } from "@/lib/noticia-media"
+import type { NoticiaBloqueEditorItem } from "@/types/noticia-bloques"
 import type {
   NoticiaEditorCategoria,
   NoticiaEditorValues,
@@ -40,7 +46,9 @@ export default function EditarNoticiaPage() {
 
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [blockUploading, setBlockUploading] = useState(false)
   const [imageFile, setImageFile] = useState<File | null>(null)
+  const [bloques, setBloques] = useState<NoticiaBloqueEditorItem[]>([])
   const [categorias, setCategorias] = useState<NoticiaEditorCategoria[]>([])
   const [slugOriginal, setSlugOriginal] = useState("")
   const [estado, setEstado] = useState("")
@@ -69,13 +77,14 @@ export default function EditarNoticiaPage() {
         return
       }
 
-      const [noticiaResult, profileResult, categoriasResult] = await Promise.all([
+      const [noticiaResult, profileResult, categoriasResult, bloquesResult] = await Promise.all([
         supabase.from("noticias").select("*").eq("id", id).single(),
         supabase.from("profiles").select("role").eq("id", user.id).single(),
         supabase
           .from("categorias")
           .select("id, nombre, slug")
           .order("nombre", { ascending: true }),
+        loadNoticiaBloques(id),
       ])
 
       if (noticiaResult.error || !noticiaResult.data) {
@@ -127,6 +136,16 @@ export default function EditarNoticiaPage() {
         return
       }
 
+      if (bloquesResult.error !== null) {
+        toast({
+          variant: "destructive",
+          title: "Error al cargar los bloques",
+          description: bloquesResult.error,
+        })
+        router.replace("/admin/noticias")
+        return
+      }
+
       setValues({
         titulo: noticia.titulo,
         resumen: noticia.resumen ?? "",
@@ -137,6 +156,7 @@ export default function EditarNoticiaPage() {
         destacado: noticia.destacado,
       })
       setCategorias(categoriasResult.data ?? [])
+      setBloques(bloquesResult.data)
       setSlugOriginal(noticia.slug)
       setEstado(noticia.estado)
       setLoading(false)
@@ -144,6 +164,15 @@ export default function EditarNoticiaPage() {
   }, [id, router, toast])
 
   const guardar = async () => {
+    if (blockUploading) {
+      toast({
+        variant: "destructive",
+        title: "Hay imágenes subiendo",
+        description: "Esperá a que terminen antes de guardar.",
+      })
+      return
+    }
+
     const slugModificado = values.slug !== slugOriginal
     const slug = slugModificado ? normalizeSlug(values.slug) : slugOriginal
 
@@ -170,20 +199,20 @@ export default function EditarNoticiaPage() {
     let imagenUrl = values.imagen_url
 
     if (imageFile) {
-      const path = `noticias/${crypto.randomUUID()}-${imageFile.name}`
-      const { error } = await supabase.storage.from("media").upload(path, imageFile)
-
-      if (error) {
+      try {
+        imagenUrl = await uploadNoticiaImage(imageFile)
+        setValues((current) => ({ ...current, imagen_url: imagenUrl }))
+        setImageFile(null)
+      } catch (error) {
         toast({
           variant: "destructive",
           title: "Error al subir imagen",
-          description: error.message,
+          description:
+            error instanceof Error ? error.message : "No se pudo subir la portada.",
         })
         setSaving(false)
         return
       }
-
-      imagenUrl = supabase.storage.from("media").getPublicUrl(path).data.publicUrl
     }
 
     const { data: updated, error } = await supabase
@@ -201,14 +230,13 @@ export default function EditarNoticiaPage() {
       .select("id")
       .maybeSingle()
 
-    setSaving(false)
-
     if (error) {
       toast({
         variant: "destructive",
         title: "Error al guardar",
         description: error.message,
       })
+      setSaving(false)
       return
     }
 
@@ -218,8 +246,24 @@ export default function EditarNoticiaPage() {
         title: "No se guardaron los cambios",
         description: "La noticia no existe o ya no tenés permiso para editarla.",
       })
+      setSaving(false)
       return
     }
+
+    const bloquesResult = await replaceNoticiaBloques(id, bloques)
+    if (bloquesResult.error) {
+      toast({
+        variant: "destructive",
+        title: "La noticia se actualizó, pero los bloques no se guardaron",
+        description: bloquesResult.restored
+          ? `${bloquesResult.error} El estado anterior de los bloques fue restaurado.`
+          : `${bloquesResult.error} Tampoco se pudo restaurar el estado anterior; revisalo antes de continuar.`,
+      })
+      setSaving(false)
+      return
+    }
+
+    setSaving(false)
 
     toast({
       title: "Cambios guardados",
@@ -257,12 +301,15 @@ export default function EditarNoticiaPage() {
                 onChange={setValues}
                 onSubmit={guardar}
                 onCancel={() => router.push("/admin/noticias")}
-                loading={saving}
+                loading={saving || blockUploading}
                 categorias={categorias}
                 slugEditable
                 showDestacado
                 imageFile={imageFile}
                 onImageFileChange={setImageFile}
+                bloques={bloques}
+                onBloquesChange={setBloques}
+                onBlockUploadingChange={setBlockUploading}
               />
             </CardContent>
           </Card>
@@ -278,6 +325,7 @@ export default function EditarNoticiaPage() {
                     ...values,
                     categoriaNombre,
                     imagenFile: imageFile,
+                    bloques,
                   }}
                 />
               </CardContent>

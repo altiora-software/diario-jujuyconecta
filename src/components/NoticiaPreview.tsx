@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { Eye, Clock } from "lucide-react";
+import NoticiaBloquesPreview from "@/components/admin/NoticiaBloquesPreview";
+import type { NoticiaBloqueEditorItem } from "@/types/noticia-bloques";
 
 type NoticiaPreviewData = {
   titulo?: string;
@@ -10,6 +12,7 @@ type NoticiaPreviewData = {
   categoriaNombre?: string | null;
   imagen_url?: string | null;
   imagenFile?: File | null;
+  bloques?: NoticiaBloqueEditorItem[];
 };
 
 export default function NoticiaPreview({ data }: { data: NoticiaPreviewData }) {
@@ -80,8 +83,16 @@ export default function NoticiaPreview({ data }: { data: NoticiaPreviewData }) {
           </p>
 
           <div className="pt-4 border-t border-white/5">
-            <div className="prose prose-invert prose-sm max-w-none text-slate-300 line-clamp-4 leading-relaxed">
-              {data.contenido || "El cuerpo de la noticia se visualizará aquí con el formato editorial del diario..."}
+            <div
+              className={`prose prose-invert prose-sm max-w-none text-slate-300 leading-relaxed ${
+                data.bloques && data.bloques.length > 0 ? "" : "line-clamp-4"
+              }`}
+            >
+              {data.bloques && data.bloques.length > 0 ? (
+                <NoticiaBloquesPreview bloques={data.bloques} />
+              ) : (
+                data.contenido || "El cuerpo de la noticia se visualizará aquí con el formato editorial del diario..."
+              )}
             </div>
           </div>
         </div>
