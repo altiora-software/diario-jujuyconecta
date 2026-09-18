@@ -134,31 +134,34 @@ export type Database = {
       }
       noticia_bloques: {
         Row: {
-          contenido: string | null
-          created_at: string | null
+          contenido: Json
+          created_at: string
           id: number
           media_url: string | null
           noticia_id: number
           orden: number
           tipo: string
+          updated_at: string
         }
         Insert: {
-          contenido?: string | null
-          created_at?: string | null
+          contenido?: Json
+          created_at?: string
           id?: number
           media_url?: string | null
           noticia_id: number
           orden: number
           tipo: string
+          updated_at?: string
         }
         Update: {
-          contenido?: string | null
-          created_at?: string | null
+          contenido?: Json
+          created_at?: string
           id?: number
           media_url?: string | null
           noticia_id?: number
           orden?: number
           tipo?: string
+          updated_at?: string
         }
         Relationships: [
           {

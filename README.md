@@ -58,6 +58,13 @@ Brindar a medios locales una plataforma propia para:
 **Backend**
 - Supabase (PostgreSQL + Auth + RLS)
 
+### Contenido editorial
+
+Las noticias conservan su contenido clásico para retrocompatibilidad y pueden
+incorporar, de forma opcional, bloques ordenados en `noticia_bloques`. La
+fundación admite párrafos, imágenes, galerías y videos por provider + URL; no
+se almacena HTML de embeds enviado por usuarios.
+
 **Deploy**
 - Vercel
 
