@@ -1,12 +1,12 @@
 'use client';
 
-import { Facebook, Instagram, Youtube, MessageCircle, ArrowUpRight } from "lucide-react";
+import { Facebook, Instagram, Youtube, ArrowUpRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
 const socialLinks = [
-  { name: "Facebook", icon: Facebook, url: "https://facebook.com", color: "#1877F2" },
-  { name: "Instagram", icon: Instagram, url: "https://instagram.com", color: "#E4405F" },
+  { name: "Facebook", icon: Facebook, url: "https://facebook.com/jujuyconecta", color: "#1877F2" },
+  { name: "Instagram", icon: Instagram, url: "https://www.instagram.com/jujuyconecta", color: "#E4405F" },
   {
     name: "X",
     icon: () => (
@@ -14,11 +14,10 @@ const socialLinks = [
         <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
       </svg>
     ),
-    url: "https://twitter.com",
+    url: "https://twitter.com/jujuyconecta",
     color: "#ffffff",
   },
-  { name: "YouTube", icon: Youtube, url: "https://youtube.com", color: "#FF0000" },
-  { name: "WhatsApp", icon: MessageCircle, url: "https://wa.me/1234567890", color: "#25D366" },
+  { name: "YouTube", icon: Youtube, url: "https://youtube.com/jujuyconecta", color: "#FF0000" },
 ];
 
 const quickLinks = [
@@ -26,7 +25,6 @@ const quickLinks = [
   { name: "Política", path: "/seccion/politica" },
   { name: "Economía", path: "/seccion/economia" },
   { name: "Deportes", path: "/seccion/deportes" },
-  { name: "Cosquín Rock 2026", path: "/seccion/cosquin-rock" },
 ];
 
 export default function Footer() {
@@ -110,12 +108,14 @@ export default function Footer() {
               <div className="absolute -right-4 -top-4 w-20 h-20 bg-primary/10 rounded-full blur-2xl group-hover:bg-primary/20 transition-colors" />
               <h4 className="text-sm font-bolt text-primary uppercase tracking-widest mb-2 italic">Sumá tu negocio</h4>
               <p className="text-xs text-secondary mb-4 font-medium">Aparecé en nuestro Marketplace y conectá con miles de lectores.</p>
-              <Link 
-                href="/servicios/marketplace" 
+              <a
+                href="https://www.jujuyconecta.com/servicios/marketplace"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="flex items-center gap-2 text-[10px] font-black uppercase tracking-tighter text-primary hover:gap-3 transition-all"
               >
                 SABER MÁS <ArrowUpRight className="w-3 h-3" />
-              </Link>
+              </a>
             </div>
           </div>
 
@@ -127,11 +127,6 @@ export default function Footer() {
             <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">
               © 2026 JUJUY CONECTA
             </p>
-            <span className="hidden md:block w-px h-4 bg-white/10" />
-            <div className="flex gap-4">
-              <Link href="/privacidad" className="text-[10px] font-bold text-slate-600 hover:text-white uppercase tracking-widest transition-colors">Privacidad</Link>
-              <Link href="/terminos" className="text-[10px] font-bold text-slate-600 hover:text-white uppercase tracking-widest transition-colors">Términos</Link>
-            </div>
           </div>
           
           <Link 
