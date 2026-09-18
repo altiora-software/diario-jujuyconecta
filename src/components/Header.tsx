@@ -9,7 +9,13 @@ import { supabase } from "@/integrations/supabase/client";
 
 type Categoria = { id: number; nombre: string; slug: string };
 const CURATED = ["provinciales", "actualidad", "deportes", "cultura", "economia"];
-const RETIRED_CATEGORY_SLUGS = new Set(["mundial-2026"]);
+const RETIRED_CATEGORY_SLUGS = new Set([
+  "cosquin-rock",
+  "cosquin-rock-2026",
+  "mundial-2026",
+  "navidad-2025",
+  "verano-2026",
+]);
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);

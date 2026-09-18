@@ -1,5 +1,5 @@
 'use client';
-import { Facebook, Instagram, Youtube, MessageCircle } from "lucide-react";
+import { Facebook, Instagram, Youtube } from "lucide-react";
 import { useState } from "react";
 
 const socialLinks = [
@@ -16,7 +16,6 @@ const socialLinks = [
     color: "#ffffff", // X en blanco queda mejor en fondo oscuro
   },
   { name: "YouTube", icon: Youtube, url: "https://youtube.com/jujuyconecta", color: "#FF0000" },
-  { name: "WhatsApp", icon: MessageCircle, url: "https://wa.me/3884488888", color: "#25D366" },
 ];
 
 export default function SocialSidebar() {
